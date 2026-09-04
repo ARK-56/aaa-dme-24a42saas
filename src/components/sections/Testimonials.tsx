@@ -11,10 +11,20 @@ export interface Testimonial {
   elevated?: boolean;
 }
 
-/** Homepage quotes. The About page passes its own set. */
+/**
+ * PLACEHOLDER — these quotes came with the purchased theme and are not real
+ * endorsements. Three of them originally named "Altivox", an unrelated company,
+ * which is corrected below so the site does not advertise someone else's brand.
+ *
+ * Do not launch with these. Attributed testimonials must be real, given with
+ * the person's permission, and reflect their actual experience; invented ones
+ * attributed to named clinicians are deceptive and, for a healthcare business,
+ * carry FTC endorsement exposure. Replace with genuine quotes or drop the
+ * section.
+ */
 export const HOME_TESTIMONIALS: Testimonial[] = [
   {
-    heading: "Unbelievable Accuracy & Clarity!",
+    heading: "Insurance Verification Made Simple!",
     avatar: "/assets/images/images/profile-6.jpg",
     quote:
       "AAA DME completely simplified our insurance verification and provided clear medical device insights. Highly recommended!",
@@ -23,26 +33,26 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     elevated: true,
   },
   {
-    heading: "Extremely Intuitive Monitoring!",
+    heading: "The Paperwork Is Handled!",
     avatar: "/assets/images/images/profile-2.jpg",
     quote:
-      "Integrating Altivox telemetry and self-care monitoring into my daily routine has been seamless. The diagnostic updates are fast and accurate.",
+      "Working with AAA DME took the insurance guesswork out of getting my patients their equipment. Verification comes back fast and the paperwork is handled.",
     name: "Dr. Sarah M,",
     specialty: "General Practitioner",
   },
   {
-    heading: "Remarkable Telemetry Devices!",
+    heading: "Fast Turnaround for Post-Op!",
     avatar: "/assets/images/images/profile-3.jpg",
     quote:
-      "Our clinics now monitor post-op patients remotely using Altivox's advanced health channels. The cost clarity and setup speeds are outstanding.",
+      "We refer post-op patients to AAA DME when they need equipment at home quickly. The cost clarity and turnaround are exactly what a busy clinic needs.",
     name: "Dr. Evelyn K,",
     specialty: "Cardiology Director",
   },
   {
-    heading: "The Best Support Integration!",
+    heading: "A Genuine Patient-First Approach!",
     avatar: "/assets/images/images/profile-4.jpg",
     quote:
-      "Altivox has bridged the gap between our recovery goals and accessible medical equipment. Highly recommend their predictive diagnostic solutions.",
+      "AAA DME has bridged the gap between our recovery plans and the equipment patients actually need at home. Their patient-first approach stands out.",
     name: "Dr. Marcus T,",
     specialty: "Rehabilitation Specialist",
   },

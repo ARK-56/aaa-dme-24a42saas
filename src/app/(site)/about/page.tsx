@@ -152,6 +152,7 @@ const ABOUT_PROCESS_STEPS: ProcessStep[] = [
   },
 ];
 
+/** PLACEHOLDER — theme copy, not real endorsements. See HOME_TESTIMONIALS. */
 const ABOUT_TESTIMONIALS: Testimonial[] = [
   {
     heading: "Unbelievable Accuracy & Clarity!",
