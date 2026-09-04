@@ -1,0 +1,29 @@
+{
+  "name": "aaa-dme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AAA DME Healthcare — Next.js storefront",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.24.0",
+    "eslint-config-next": "^15.5.4",
+    "typescript": "^5.8.3"
+  }
+}

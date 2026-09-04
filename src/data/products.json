@@ -1,0 +1,600 @@
+[
+    {
+        "id": "3fcbc09d-615a-4197-ade5-8a36ce3c4503",
+        "name": "ProLite Ultra Wheelchair",
+        "price": 1257,
+        "originalPrice": 1635,
+        "image": "assets/images/products/p25.avif",
+        "images": [
+            "assets/images/products/p25.avif"
+        ],
+        "category": "Wheelchairs",
+        "hcpcsCode": "K0001",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.8,
+        "reviewCount": 124,
+        "colors": [
+            "Black",
+            "Blue",
+            "Silver"
+        ],
+        "sizes": [
+            "Standard",
+            "Wide"
+        ],
+        "description": "Ultra-lightweight aluminum frame wheelchair with ergonomic design for maximum comfort and mobility.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "02be18b0-56b8-44f3-a17b-a85acb9c4efb",
+        "name": "MedCare Hospital Bed",
+        "price": 2897,
+        "originalPrice": 3450,
+        "image": "assets/images/products/p23.avif",
+        "images": [
+            "assets/images/products/p23.avif"
+        ],
+        "category": "Hospital Beds",
+        "hcpcsCode": "E0260",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "white-glove",
+        "warrantyType": "5-Year Full",
+        "inStock": true,
+        "rating": 4.9,
+        "reviewCount": 89,
+        "description": "Full-electric adjustable hospital bed with premium mattress, side rails, and whisper-quiet motor.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "beab45b7-d83b-4976-b02b-01e2c4ffea6b",
+        "name": "StrideSafe Rollator Walker",
+        "price": 389,
+        "image": "assets/images/products/p29.png",
+        "images": [
+            "assets/images/products/p29.png"
+        ],
+        "category": "Walkers & Rollators",
+        "hcpcsCode": "E0143",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.7,
+        "reviewCount": 256,
+        "colors": [
+            "Red",
+            "Blue",
+            "Black"
+        ],
+        "description": "Four-wheel rollator with padded seat, storage basket, and adjustable height handles.",
+        "inventory": 7
+    },
+    {
+        "id": "02e02e2f-4fdf-4a95-a206-bc3cba2ad1ec",
+        "name": "AirSense CPAP Machine",
+        "price": 1442,
+        "originalPrice": 1875,
+        "image": "assets/images/products/p22.avif",
+        "images": [
+            "assets/images/products/p22.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "E0601",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "standard",
+        "warrantyType": "3-Year Full",
+        "inStock": true,
+        "rating": 4.6,
+        "reviewCount": 198,
+        "description": "Auto-adjusting CPAP with heated humidifier, quiet operation, and integrated data tracking.",
+        "isSale": true,
+        "inventory": 9
+    },
+    {
+        "id": "47c48a65-a8d9-4770-b358-c6dc91752b87",
+        "name": "OxyFlow Concentrator",
+        "price": 1861,
+        "originalPrice": 2795,
+        "image": "assets/images/products/p4.avif",
+        "images": [
+            "assets/images/products/p4.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "E1390",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "ltl-freight",
+        "warrantyType": "3-Year Full",
+        "inStock": true,
+        "rating": 4.8,
+        "reviewCount": 67,
+        "description": "Portable oxygen concentrator with continuous flow, long battery life, and FAA-approved for air travel.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "9fb1d88f-e4df-434e-a08b-c17e34ded751",
+        "name": "FlexRide Knee Scooter",
+        "price": 279,
+        "image": "assets/images/products/p19.avif",
+        "images": [
+            "assets/images/products/p19.avif"
+        ],
+        "category": "Mobility Scooters",
+        "hcpcsCode": "E0118",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.5,
+        "reviewCount": 312,
+        "colors": [
+            "Black",
+            "Blue"
+        ],
+        "description": "Steerable knee scooter with dual braking system, adjustable knee pad, and foldable design.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000001",
+        "name": "ComfortGrip Bath Chair",
+        "price": 149,
+        "image": "assets/images/products/p28.svg",
+        "images": [
+            "assets/images/products/p28.svg"
+        ],
+        "category": "Bath Safety",
+        "hcpcsCode": "E0240",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.6,
+        "reviewCount": 203,
+        "description": "Adjustable-height shower chair with non-slip rubber feet and drainage holes for safe bathing.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000002",
+        "name": "SafeStep Transfer Bench",
+        "price": 219,
+        "image": "assets/images/products/p9.avif",
+        "images": [
+            "assets/images/products/p9.avif"
+        ],
+        "category": "Bath Safety",
+        "hcpcsCode": "E0247",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.4,
+        "reviewCount": 178,
+        "description": "Sliding transfer bench with backrest and armrest for safe entry and exit from the bathtub.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000003",
+        "name": "HydraLift Patient Lift",
+        "price": 3495,
+        "originalPrice": 4200,
+        "image": "assets/images/products/p21.avif",
+        "images": [
+            "assets/images/products/p21.avif"
+        ],
+        "category": "Patient Lifts",
+        "hcpcsCode": "E0630",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "white-glove",
+        "warrantyType": "3-Year Full",
+        "inStock": true,
+        "rating": 4.7,
+        "reviewCount": 45,
+        "description": "Hydraulic patient lift with 450 lb capacity, six-point spreader bar, and full-body sling included.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000004",
+        "name": "EasyGlide Hoyer Sling",
+        "price": 189,
+        "image": "assets/images/products/p18.avif",
+        "images": [
+            "assets/images/products/p18.avif"
+        ],
+        "category": "Patient Lifts",
+        "hcpcsCode": "E0621",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.3,
+        "reviewCount": 92,
+        "sizes": [
+            "Small",
+            "Medium",
+            "Large"
+        ],
+        "description": "Padded mesh patient sling compatible with most lift systems, with head support and quick-dry fabric.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000005",
+        "name": "PowerDrive Mobility Scooter",
+        "price": 2299,
+        "originalPrice": 2799,
+        "image": "assets/images/products/p5.avif",
+        "images": [
+            "assets/images/products/p5.avif"
+        ],
+        "category": "Mobility Scooters",
+        "hcpcsCode": "K0800",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "ltl-freight",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.8,
+        "reviewCount": 156,
+        "colors": [
+            "Red",
+            "Blue",
+            "Silver"
+        ],
+        "description": "4-wheel electric mobility scooter with 25-mile range, LED headlights, and full suspension.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000006",
+        "name": "AirPure Nebulizer System",
+        "price": 89,
+        "image": "assets/images/products/p20.avif",
+        "images": [
+            "assets/images/products/p20.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "E0570",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.5,
+        "reviewCount": 340,
+        "description": "Compact tabletop nebulizer with quiet piston compressor and five reusable nebulizer kits included.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000007",
+        "name": "LiftAssist Recliner Chair",
+        "price": 1195,
+        "originalPrice": 1495,
+        "image": "assets/images/products/p2.avif",
+        "images": [
+            "assets/images/products/p2.avif"
+        ],
+        "category": "Patient Lifts",
+        "hcpcsCode": "E0627",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "ltl-freight",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.6,
+        "reviewCount": 87,
+        "colors": [
+            "Brown",
+            "Blue",
+            "Burgundy"
+        ],
+        "description": "Power lift recliner with heat and massage, infinite positions, and dual motor for independent back and leg control.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000008",
+        "name": "QuietBreeze BiPAP Machine",
+        "price": 1899,
+        "originalPrice": 2350,
+        "image": "assets/images/products/p8.avif",
+        "images": [
+            "assets/images/products/p8.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "E0471",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "standard",
+        "warrantyType": "3-Year Full",
+        "inStock": true,
+        "rating": 4.7,
+        "reviewCount": 74,
+        "description": "Auto BiPAP with expiratory pressure relief, integrated humidifier, and wireless data reporting.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000009",
+        "name": "TiltMaster Power Wheelchair",
+        "price": 4850,
+        "originalPrice": 5900,
+        "image": "assets/images/products/p16.avif",
+        "images": [
+            "assets/images/products/p16.avif"
+        ],
+        "category": "Wheelchairs",
+        "hcpcsCode": "K0856",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "white-glove",
+        "warrantyType": "5-Year Full",
+        "inStock": true,
+        "rating": 4.9,
+        "reviewCount": 38,
+        "colors": [
+            "Black",
+            "Red"
+        ],
+        "description": "Power tilt-in-space wheelchair with joystick control, 300 lb capacity, and programmable seating positions.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000010",
+        "name": "ClearView Pulse Oximeter",
+        "price": 49,
+        "image": "assets/images/products/p7.avif",
+        "images": [
+            "assets/images/products/p7.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "A4606",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.4,
+        "reviewCount": 528,
+        "description": "Fingertip pulse oximeter with large OLED display, SpO2 and pulse rate monitoring, and lanyard included.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000011",
+        "name": "ProFlex Bariatric Walker",
+        "price": 445,
+        "image": "assets/images/products/p24.avif",
+        "images": [
+            "assets/images/products/p24.avif"
+        ],
+        "category": "Walkers & Rollators",
+        "hcpcsCode": "E0148",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.5,
+        "reviewCount": 112,
+        "description": "Heavy-duty bariatric rollator with 500 lb capacity, extra-wide seat, and reinforced steel frame.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000012",
+        "name": "MediRest Alternating Pressure Mattress",
+        "price": 689,
+        "originalPrice": 849,
+        "image": "assets/images/products/p3.avif",
+        "images": [
+            "assets/images/products/p3.avif"
+        ],
+        "category": "Hospital Beds",
+        "hcpcsCode": "E0277",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.6,
+        "reviewCount": 95,
+        "description": "Alternating pressure mattress system with whisper-quiet pump, adjustable pressure settings, and CPR quick-release.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000013",
+        "name": "GripSafe Raised Toilet Seat",
+        "price": 79,
+        "image": "assets/images/products/p26.avif",
+        "images": [
+            "assets/images/products/p26.avif"
+        ],
+        "category": "Bath Safety",
+        "hcpcsCode": "E0244",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.3,
+        "reviewCount": 267,
+        "description": "Locking raised toilet seat with padded armrests, tool-free installation, and 300 lb weight capacity.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000014",
+        "name": "UltraFold Transport Chair",
+        "price": 329,
+        "image": "assets/images/products/p13.avif",
+        "images": [
+            "assets/images/products/p13.avif"
+        ],
+        "category": "Wheelchairs",
+        "hcpcsCode": "E1038",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.5,
+        "reviewCount": 189,
+        "colors": [
+            "Black",
+            "Blue",
+            "Burgundy"
+        ],
+        "description": "Lightweight folding transport wheelchair at only 19 lbs with companion brakes and swing-away footrests.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000015",
+        "name": "SureStep Cane Quad Base",
+        "price": 59,
+        "image": "assets/images/products/p30.png",
+        "images": [
+            "assets/images/products/p30.png"
+        ],
+        "category": "Walkers & Rollators",
+        "hcpcsCode": "E0105",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.2,
+        "reviewCount": 445,
+        "colors": [
+            "Black",
+            "Silver"
+        ],
+        "description": "Small-base quad cane with ergonomic offset handle, adjustable height, and non-slip rubber tips.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000016",
+        "name": "BreathEasy Suction Unit",
+        "price": 399,
+        "image": "assets/images/products/p27.avif",
+        "images": [
+            "assets/images/products/p27.avif"
+        ],
+        "category": "Respiratory",
+        "hcpcsCode": "E0600",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": false,
+        "rating": 4.7,
+        "reviewCount": 63,
+        "description": "Portable suction unit with rechargeable battery, adjustable vacuum pressure, and autoclavable collection canister.",
+        "inventory": 0
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000017",
+        "name": "ComfortAir Gel Cushion",
+        "price": 129,
+        "image": "assets/images/products/p17.avif",
+        "images": [
+            "assets/images/products/p17.avif"
+        ],
+        "category": "Wheelchairs",
+        "hcpcsCode": "E2603",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.4,
+        "reviewCount": 221,
+        "sizes": [
+            "16x16",
+            "18x16",
+            "20x18"
+        ],
+        "description": "Gel wheelchair seat cushion with memory foam base, waterproof cover, and pressure redistribution design.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000018",
+        "name": "NovaBed Semi-Electric Bed",
+        "price": 1895,
+        "originalPrice": 2295,
+        "image": "assets/images/products/p31.png",
+        "images": [
+            "assets/images/products/p31.png"
+        ],
+        "category": "Hospital Beds",
+        "hcpcsCode": "E0261",
+        "fdaClass": "Class II",
+        "isPrescriptionRequired": true,
+        "shippingClass": "white-glove",
+        "warrantyType": "3-Year Full",
+        "inStock": true,
+        "rating": 4.7,
+        "reviewCount": 56,
+        "description": "Semi-electric hospital bed with electric head and foot adjustment, manual height, and locking casters.",
+        "isSale": true,
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000019",
+        "name": "AquaShield Shower Commode",
+        "price": 349,
+        "image": "assets/images/products/p1.avif",
+        "images": [
+            "assets/images/products/p1.avif"
+        ],
+        "category": "Bath Safety",
+        "hcpcsCode": "E0167",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "1-Year Limited",
+        "inStock": true,
+        "rating": 4.5,
+        "reviewCount": 134,
+        "description": "Rolling shower commode chair with padded seat, locking wheels, and removable bucket for easy cleaning.",
+        "inventory": 10
+    },
+    {
+        "id": "a1b2c3d4-1111-4aaa-bbbb-000000000020",
+        "name": "TravelLite Folding Ramp",
+        "price": 259,
+        "image": "assets/images/products/p12.avif",
+        "images": [
+            "assets/images/products/p12.avif"
+        ],
+        "category": "Mobility Scooters",
+        "hcpcsCode": "E1399",
+        "fdaClass": "Class I",
+        "isPrescriptionRequired": false,
+        "shippingClass": "standard",
+        "warrantyType": "2-Year Limited",
+        "inStock": true,
+        "rating": 4.6,
+        "reviewCount": 178,
+        "sizes": [
+            "4ft",
+            "6ft",
+            "8ft"
+        ],
+        "description": "Portable folding aluminum ramp with 600 lb capacity, non-slip surface, and carrying handle for easy transport.",
+        "inventory": 10
+    }
+]
