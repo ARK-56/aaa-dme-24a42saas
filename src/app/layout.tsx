@@ -12,6 +12,11 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  // Resolves canonical and Open Graph URLs to absolute ones. Override with
+  // NEXT_PUBLIC_SITE_URL on preview deployments.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://aaadmeinc.com"
+  ),
   title: {
     default: "AAA DME",
     template: "AAA DME - %s",
@@ -19,6 +24,12 @@ export const metadata: Metadata = {
   description:
     "AAA DME Healthcare — doctor-prescribed durable medical equipment, insurance handled for you, delivered nationwide.",
   icons: { icon: "/assets/images/images/icon.png" },
+  openGraph: {
+    siteName: "AAA DME",
+    type: "website",
+    // No `url` here on purpose: a value set at the root would emit the same
+    // og:url on every page. Set it per route when a page needs a canonical.
+  },
 };
 
 export default function RootLayout({

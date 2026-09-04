@@ -3,8 +3,10 @@ import DiscoverTag from "@/components/sections/DiscoverTag";
 /**
  * Legal page body. The theme shipped identical copy on the privacy and terms
  * pages — only the title differs — so both routes render this one component.
- * The copy still carries the template's placeholder brand and contact details;
- * replace it here and it updates both pages.
+ *
+ * The wording is still the theme's generic boilerplate (rebranded to AAA DME);
+ * it has not been reviewed by anyone qualified. The terms page in particular
+ * needs its own text rather than a copy of the privacy policy.
  */
 export default function LegalDocument({ title }: { title: string }) {
   return (
@@ -16,7 +18,7 @@ export default function LegalDocument({ title }: { title: string }) {
           </div>
           <h1 className="legal-master-page-title">{title}</h1>
           <p className="legal-master-page-tagline">
-            Greenstorm is committed to protecting your privacy and ensuring the
+            AAA DME is committed to protecting your privacy and ensuring the
             security of your personal information. This Privacy Policy outlines
             how we collect, use, and safeguard your data.
           </p>
@@ -28,7 +30,7 @@ export default function LegalDocument({ title }: { title: string }) {
               Personal Information We Collect
             </h2>
             <p className="legal-body-copy">
-              When you visit the Greenstorm, we automatically collect certain
+              When you visit aaadmeinc.com, we automatically collect certain
               information about your device, including information about your web
               browser, IP address, time zone, and some of the installed cookies
               on your device. Additionally, as you browse the Site, we collect
@@ -127,16 +129,16 @@ export default function LegalDocument({ title }: { title: string }) {
               <li>
                 <strong>Email:</strong>{" "}
                 <a
-                  href="mailto:enquiries@greenstorm.energy"
+                  href="mailto:aaadmeinc@gmail.com"
                   className="legal-inline-link"
                 >
-                  enquiries@greenstorm.energy
+                  aaadmeinc@gmail.com
                 </a>
               </li>
               <li>
                 <strong>Phone:</strong>{" "}
-                <a href="tel:03330905959" className="legal-inline-link">
-                  0333 090 5959
+                <a href="tel:+13475990043" className="legal-inline-link">
+                  (347) 599 0043
                 </a>
               </li>
             </ul>

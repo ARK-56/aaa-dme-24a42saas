@@ -354,7 +354,12 @@ export default function Footer() {
           <div className="footer-credits-container">
             <span>
               Website By{" "}
-              <a href="#" className="agency-credit-link">
+              <a
+                href="https://squadtechsol.com"
+                target="_blank"
+                rel="noopener"
+                className="agency-credit-link"
+              >
                 Squad Tech Solutions
               </a>
             </span>
