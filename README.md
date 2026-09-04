@@ -33,6 +33,30 @@ npm run dev
 
 Other scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`.
 
+### Redis
+
+```bash
+npm run redis:check
+```
+
+Diagnoses `REDIS_URL` step by step — DNS, TCP, authentication, a read/write
+round-trip — then lists which collections exist. Exits non-zero on failure, so
+it works as a deploy gate.
+
+```bash
+npm run redis:seed
+```
+
+Initialises any collection that is missing. `products.json` and
+`featured-products.json` come from `src/data/`; the rest start as empty arrays.
+Collections that already hold data are never overwritten.
+
+> **The Redis instance the theme shipped with no longer exists.** Its hostname
+> returns NXDOMAIN — the database was deleted or the subscription lapsed.
+> Provision a new one, put its URL in `.env.local`, and run `npm run redis:seed`.
+> Until then `/api/db/*` returns 503 and the storefront runs from the seed
+> catalogue, which is the intended fallback.
+
 ## Security notes — read before going live
 
 These carry over from the original codebase and are **not** fixed by the port:
