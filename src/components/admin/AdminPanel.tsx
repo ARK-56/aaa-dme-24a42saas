@@ -8,14 +8,10 @@ import CodeCopyModal from "@/components/admin/CodeCopyModal";
 import RequestDetailModal from "@/components/admin/RequestDetailModal";
 import { useAuth } from "@/context/AuthProvider";
 import { useStore } from "@/context/StoreProvider";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { ProfileRow } from "@/lib/supabase/types";
 import { assetSrc, productHref, ROUTES } from "@/lib/routes";
-import type {
-  CoverageRequest,
-  Order,
-  Product,
-  User,
-  Voucher,
-} from "@/lib/types";
+import type { CoverageRequest, Order, Product, Voucher } from "@/lib/types";
 
 export const VOUCHER_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -136,17 +132,13 @@ function StatusBadge({ status }: { status: string | undefined }) {
 
 export default function AdminPanel() {
   const { session, isAdmin, hydrated, logout } = useAuth();
-  const {
-    products,
-    requests,
-    orders,
-    users,
-    vouchers,
-    saveVouchers,
-    addVoucher,
-    updateRequestedOrderStatus,
-    getProductById,
-  } = useStore();
+  const { products, requests, orders, vouchers, getProductById, refresh } =
+    useStore();
+  const supabase = getSupabaseBrowserClient();
+
+  // Staff-only listing. RLS lets an admin read every profile; for anyone else
+  // this simply comes back empty, so the tab is safe even if the page loads.
+  const [users, setUsers] = useState<ProfileRow[]>([]);
 
   const [tab, setTab] = useState<TabId>("products");
   const [detailRequest, setDetailRequest] = useState<CoverageRequest | null>(
@@ -157,41 +149,87 @@ export default function AdminPanel() {
   );
   const [issuedEmail, setIssuedEmail] = useState<string | null>(null);
 
-  // Expire any granted code whose TTL has lapsed, mirroring the theme's sweep.
   useEffect(() => {
-    const stale = vouchers.some(
+    if (!supabase || !isAdmin) return;
+    let active = true;
+    supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (active) setUsers(data ?? []);
+      });
+    return () => {
+      active = false;
+    };
+  }, [supabase, isAdmin]);
+
+  // Sweep codes whose TTL lapsed. Postgres is the source of truth now, so this
+  // writes the status back rather than only fixing it in memory.
+  useEffect(() => {
+    if (!supabase) return;
+    const stale = vouchers.filter(
       (v) => v.status === "granted" && v.expiresAt && Date.now() > v.expiresAt
     );
-    if (!stale) return;
-    saveVouchers(
-      vouchers.map((v) =>
-        v.status === "granted" && v.expiresAt && Date.now() > v.expiresAt
-          ? { ...v, status: "expired" }
-          : v
-      )
-    );
-  }, [vouchers, saveVouchers]);
+    if (stale.length === 0) return;
+    supabase
+      .from("vouchers")
+      .update({ status: "expired" })
+      .in("code", stale.map((v) => v.code))
+      .then(() => refresh());
+  }, [vouchers, supabase, refresh]);
 
   const handleDecline = useCallback(
-    (requestId: string) => {
-      if (window.confirm(`Are you sure you want to decline request ${requestId}?`)) {
-        updateRequestedOrderStatus(requestId, "declined");
+    async (requestId: string) => {
+      if (!supabase) return;
+      if (!window.confirm(`Are you sure you want to decline request ${requestId}?`)) {
+        return;
       }
+      const { error } = await supabase
+        .from("coverage_requests")
+        .update({ status: "declined" })
+        .eq("request_ref", requestId);
+      if (error) {
+        window.alert(`Could not decline the request: ${error.message}`);
+        return;
+      }
+      await refresh();
     },
-    [updateRequestedOrderStatus]
+    [supabase, refresh]
   );
 
   const handleAssign = useCallback(
-    (request: CoverageRequest, code: string, productId: string, userId: string) => {
-      addVoucher({
+    async (
+      request: CoverageRequest,
+      code: string,
+      productId: string,
+      userId: string
+    ) => {
+      if (!supabase) return;
+
+      const { error: voucherError } = await supabase.from("vouchers").insert({
         code,
-        status: "granted",
-        createdAt: Date.now(),
-        expiresAt: Date.now() + VOUCHER_TTL_MS,
-        productId,
-        userId,
+        product_id: productId,
+        user_id: userId,
+        request_id: null,
+        expires_at: new Date(Date.now() + VOUCHER_TTL_MS).toISOString(),
       });
-      updateRequestedOrderStatus(request.requestId, "granted");
+
+      if (voucherError) {
+        window.alert(`Could not issue the code: ${voucherError.message}`);
+        return;
+      }
+
+      const { error: statusError } = await supabase
+        .from("coverage_requests")
+        .update({ status: "granted" })
+        .eq("request_ref", request.requestId);
+
+      if (statusError) {
+        window.alert(`Code issued, but the request status did not update: ${statusError.message}`);
+      }
+
+      await refresh();
 
       const product = getProductById(productId);
       const productName = product?.name || request.productName || "Device";
@@ -211,7 +249,7 @@ Best regards,
 AAA DME Medical Supply Care Team`
       );
     },
-    [addVoucher, updateRequestedOrderStatus, getProductById]
+    [supabase, refresh, getProductById]
   );
 
   const counts = useMemo(
@@ -684,9 +722,9 @@ AAA DME Medical Supply Care Team`
                   </p>
                 </div>
               </div>
-              <AdminTable<User>
+              <AdminTable<ProfileRow>
                 rows={users}
-                rowKey={(u, i) => u.userId || `user-${i}`}
+                rowKey={(u, i) => u.id || `user-${i}`}
                 searchPlaceholder="Search by user ID, name, email…"
                 emptyMessage="No users found matching your search."
                 columns={[
@@ -694,11 +732,12 @@ AAA DME Medical Supply Care Team`
                   { label: "User ID", className: "col-id" },
                   { label: "Full Name" },
                   { label: "Email Address" },
+                  { label: "Role" },
                   { label: "Date Joined" },
                 ]}
                 filterFn={(u, q) =>
-                  (u.userId || "").toLowerCase().includes(q) ||
-                  (u.name || "").toLowerCase().includes(q) ||
+                  (u.id || "").toLowerCase().includes(q) ||
+                  (u.full_name || "").toLowerCase().includes(q) ||
                   (u.email || "").toLowerCase().includes(q)
                 }
                 renderRow={(u, idx) => (
@@ -707,13 +746,22 @@ AAA DME Medical Supply Care Team`
                       {idx}
                     </td>
                     <td>
-                      <span className="id-mono">{safe(u.userId)}</span>
+                      <span className="id-mono" title={u.id}>
+                        {u.id.slice(0, 8)}…
+                      </span>
                     </td>
                     <td style={{ fontWeight: 600, color: "#03231c" }}>
-                      {safe(u.name)}
+                      {safe(u.full_name)}
                     </td>
                     <td>{safe(u.email)}</td>
-                    <td>{fmt(u.doj)}</td>
+                    <td>
+                      {u.is_admin ? (
+                        <span className="badge badge-green">Admin</span>
+                      ) : (
+                        <span className="badge badge-gray">Patient</span>
+                      )}
+                    </td>
+                    <td>{fmt(u.created_at)}</td>
                   </>
                 )}
               />

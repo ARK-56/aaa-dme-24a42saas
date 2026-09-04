@@ -1,31 +1,22 @@
 # AAA DME — Next.js
 
 Storefront and admin dashboard for AAA DME Healthcare, rebuilt on Next.js 15
-(App Router, TypeScript, React 19) from the static theme in [`theme/`](theme/).
+(App Router, TypeScript, React 19) from the static theme in [`theme/`](theme/),
+with Supabase (Postgres, Auth, Storage) behind it.
 
 ## Getting started
 
 ```bash
 npm install
-```
-
-Copy the environment template and fill it in:
-
-```bash
 cp .env.local.example .env.local
 ```
 
 | Variable | Purpose |
 | --- | --- |
-| `REDIS_URL` | Connection string for the JSON document store behind `/api/db/*` |
-| `RESEND_API_KEY` | Server-side key for sending signup verification codes |
-| `RESEND_FROM_EMAIL` | Sender address; the domain must be verified in Resend |
-| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | EmailJS browser key (public by design) |
-| `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | EmailJS service |
-| `NEXT_PUBLIC_EMAILJS_CONTACT_TEMPLATE_ID` | Template for the contact + footer CTA forms |
-| `NEXT_PUBLIC_EMAILJS_REQUEST_TEMPLATE_ID` | Template for the medical intake modal |
-
-Then:
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL, from Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key — safe to expose; RLS decides what it can actually do |
+| `NEXT_PUBLIC_SITE_URL` | Public origin for canonical and Open Graph URLs |
+| `NEXT_PUBLIC_EMAILJS_*` | Contact form, footer CTA and intake modal delivery |
 
 ```bash
 npm run dev
@@ -33,44 +24,65 @@ npm run dev
 
 Other scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`.
 
-### Redis
+Without Supabase configured the app still builds and runs: the storefront serves
+the seed catalogue in `src/data/`, and anything requiring an account is disabled.
 
-```bash
-npm run redis:check
+## Database
+
+Apply the migrations in `supabase/migrations/` — `supabase db push`, or paste
+them into the SQL editor in order:
+
+1. **`0001_initial_schema.sql`** — tables, row level security, the `place_order`
+   function, and the private `prescriptions` storage bucket.
+2. **`0002_seed_catalogue.sql`** — the 26 products. Idempotent, and product ids
+   are preserved so existing `/product/<id>` links keep working.
+
+### Making the first admin
+
+`is_admin` defaults to false and cannot be granted from the UI, by design.
+Register normally, then in the SQL editor:
+
+```sql
+update public.profiles set is_admin = true where email = 'you@example.com';
 ```
 
-Diagnoses `REDIS_URL` step by step — DNS, TCP, authentication, a read/write
-round-trip — then lists which collections exist. Exits non-zero on failure, so
-it works as a deploy gate.
+### Why it is shaped this way
 
-```bash
-npm run redis:seed
-```
+The previous build kept each collection as a **single JSON blob** in Redis, so
+placing an order meant reading the whole array, appending, and writing it back.
+Two simultaneous checkouts overwrote each other and an order was silently lost.
+Rows make that impossible.
 
-Initialises any collection that is missing. `products.json` and
-`featured-products.json` come from `src/data/`; the rest start as empty arrays.
-Collections that already hold data are never overwritten.
+`place_order()` does voucher redemption, inventory decrement and the order insert
+in one transaction, locking the voucher row so a code cannot be redeemed twice,
+and taking the price from the product row so the browser cannot dictate what is
+charged. There is deliberately **no insert policy on `orders`** — the RPC is the
+only way in.
 
-> **The Redis instance the theme shipped with no longer exists.** Its hostname
-> returns NXDOMAIN — the database was deleted or the subscription lapsed.
-> Provision a new one, put its URL in `.env.local`, and run `npm run redis:seed`.
-> Until then `/api/db/*` returns 503 and the storefront runs from the seed
-> catalogue, which is the intended fallback.
+Every table has RLS: a patient reads only their own orders, requests and codes,
+while issuing a code and changing a request's status are staff-only.
 
 ## Security notes — read before going live
 
-These carry over from the original codebase and are **not** fixed by the port:
+Fixed by the Supabase migration:
 
-- **Rotate the Redis and Resend credentials.** Both were hardcoded in plain text
-  in `theme/server.js`. They now live in `.env.local` (gitignored), but the old
-  values should be considered compromised.
-- **`/api/db/*` is unauthenticated.** Any visitor can read or overwrite every
-  collection, including `users.json`. It needs an auth check before deployment.
-- **Passwords are stored in plain text** in `users.json`, and login is verified
-  in the browser. Replace this with a real session-based auth flow and hashed
-  credentials before handling patient accounts.
-- **The admin gate is client-side only.** `/admin-panel` checks the session in
-  `localStorage`, so it keeps honest users out but stops no one determined.
+- Passwords are now hashed and verified by Supabase Auth, not compared in the
+  browser against a plaintext store.
+- The admin gate is a database policy, not a `localStorage` check.
+- The unauthenticated `/api/db/*` endpoint — which let any visitor read or
+  overwrite every collection — is gone.
+- Prescription uploads are stored in a private bucket instead of being read in
+  the browser and discarded.
+
+Still outstanding:
+
+- **HIPAA.** The intake form collects dates of birth, Medicare IDs and
+  prescriptions. Supabase supports HIPAA only on the Team plan with a signed BAA
+  and the paid HIPAA add-on, with projects marked High Compliance and MFA
+  enforced. Free and Pro do not qualify at any configuration.
+- **Rotate the old credentials.** The Redis URL and Resend key were hardcoded in
+  `theme/server.js`; treat both as compromised.
+- Neither legal document has been reviewed by an attorney.
 
 ## Architecture
 
@@ -79,25 +91,25 @@ src/
   app/
     (site)/            Public pages; layout adds Header + Footer
     admin-panel/       Admin dashboard; layout loads admin-panel.css
-    api/db/[file]/     Redis-backed JSON store (allowlisted collections)
-    api/send-verification/  Signup codes via Resend
   components/          Route views and shared UI, grouped by feature
   context/             UiProvider → StoreProvider → AuthProvider → RequestModalProvider
+  data/                Seed catalogue and per-product editorial copy
   hooks/useSlider.ts   Shared carousel behaviour
-  lib/                 Types, seed catalog, storage keys, routes, email
+  lib/supabase/        Browser and server clients, row types, row↔UI mappers
+  middleware.ts        Refreshes the auth session on each request
   styles/              style.css and admin-panel.css, taken from the theme
+supabase/migrations/   Schema and catalogue seed
 ```
 
 ### Data flow
 
-`StoreProvider` replaces the theme's `data-store.js`. On mount it warms state
-from `localStorage`, then pulls authoritative copies from `/api/db/*`. Writes go
-to state, the local cache, and the server together. localStorage keys are
-unchanged from the theme, so an existing browser session carries over.
+`StoreProvider` queries Supabase directly. The catalogue is public; orders,
+requests and vouchers are scoped by RLS, so the client sends no user id filter —
+an anonymous visitor simply receives nothing. The cart stays in `localStorage`:
+it holds no PHI and needs no account.
 
-If Redis is unreachable the API returns 503 quickly and the app falls back to the
-catalog in `src/data/products.json` — the storefront stays browsable, exactly as
-the theme behaved when its server was down.
+`src/data/productContent.ts` holds the long-form product copy. It is kept out of
+the database on purpose, so editing a product in the admin panel cannot wipe it.
 
 ### Route map
 
@@ -123,17 +135,18 @@ Blog slugs: `cpap-supplies-covered`, `wheelchair-fast`,
 
 ### The `theme/` directory
 
-Kept as reference only — it is excluded from the build, lint, and typecheck. Its
+Reference only — excluded from the build, lint, typecheck, and from git. Its
 `style.css` and `admin-panel.css` were copied to `src/styles/` (with the five
 relative `url()` paths rewritten to `/assets/...`), and its images and video to
-`public/assets/`. Its vanilla JS engines have all been rewritten in React and are
-no longer used. Delete the folder once you are satisfied with the port.
+`public/assets/`. Its vanilla JS engines have all been rewritten in React.
+It still contains hardcoded credentials, so do not commit it.
 
 ## Known gaps
 
-- The seeded `admin@example.com` / `admin123` account from the theme still works.
-- The privacy and terms pages still carry the template's placeholder copy
-  (it references "Greenstorm" and an unrelated contact address). Both render from
-  `src/components/legal/LegalDocument.tsx`.
-- Uploaded prescription files are read client-side and only a "file attached"
-  flag is stored; the file itself is never persisted.
+- The four homepage and About testimonials are invented quotes attributed to
+  named clinicians, inherited from the theme. They are flagged in code and must
+  be replaced with real, permissioned quotes before launch.
+- The terms page and privacy policy are drafts written against the real service,
+  but no attorney has reviewed them.
+- The two videos in `public/assets/images/videos/` are 66 MB and 56 MB, over
+  GitHub's recommended file size. Consider Git LFS or a CDN.

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/context/AuthProvider";
-import { useStore } from "@/context/StoreProvider";
 
 const SubmitArrow = () => (
   <div className="submit-arrow-badge">
@@ -19,7 +18,13 @@ const SubmitArrow = () => (
   </div>
 );
 
-/** Login / Register / Verify modal, rendered once at the app root. */
+/**
+ * Login / Register / Confirm modal, rendered once at the app root.
+ *
+ * The theme generated its own six-digit code and mailed it through Resend.
+ * Supabase Auth sends a confirmation link instead, so the third step is now an
+ * instruction to check the inbox rather than a code entry form.
+ */
 export default function AuthModal() {
   const {
     modalOpen,
@@ -27,12 +32,11 @@ export default function AuthModal() {
     setStep,
     closeModal,
     login,
-    startEmailVerification,
-    confirmVerification,
+    register,
+    resendConfirmation,
     cancelVerification,
     pendingEmail,
   } = useAuth();
-  const { users } = useStore();
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -45,16 +49,13 @@ export default function AuthModal() {
   const [registerError, setRegisterError] = useState("");
   const [sending, setSending] = useState(false);
 
-  const [code, setCode] = useState("");
   const [verifyError, setVerifyError] = useState("");
 
-  // Clear transient state whenever the modal is dismissed.
   useEffect(() => {
     if (modalOpen) return;
     setLoginError("");
     setRegisterError("");
     setVerifyError("");
-    setCode("");
   }, [modalOpen]);
 
   useEffect(() => {
@@ -67,13 +68,13 @@ export default function AuthModal() {
 
   if (!modalOpen) return null;
 
-  const handleLogin = (event: FormEvent) => {
+  const handleLogin = async (event: FormEvent) => {
     event.preventDefault();
-    const result = login(loginEmail.trim(), loginPassword);
+    setLoginError("");
+    const result = await login(loginEmail.trim(), loginPassword);
     if (result.success) {
       setLoginEmail("");
       setLoginPassword("");
-      setLoginError("");
     } else {
       setLoginError(result.message ?? "Invalid email or password.");
     }
@@ -87,45 +88,24 @@ export default function AuthModal() {
       setRegisterError("Passwords do not match.");
       return;
     }
-    // Fail before a code is sent if the address is already taken.
-    if (users.some((u) => u.email.toLowerCase() === email.trim().toLowerCase())) {
-      setRegisterError("User email already registered.");
-      return;
-    }
 
     setSending(true);
-    const result = await startEmailVerification(
-      name.trim(),
-      email.trim(),
-      password
-    );
+    // Supabase rejects an address that is already registered, so there is no
+    // need to check a client-side user list first — and no such list exists now.
+    const result = await register(name.trim(), email.trim(), password);
     setSending(false);
-    // Delivery failures are surfaced on the verify step, not treated as fatal.
-    if (!result.success && result.message) setVerifyError(result.message);
-  };
 
-  const handleVerify = (event: FormEvent) => {
-    event.preventDefault();
-    setVerifyError("");
-    const result = confirmVerification(code);
-    if (result.success) {
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setCode("");
-    } else {
-      setVerifyError(result.message ?? "Verification failed.");
+    if (!result.success) {
+      setRegisterError(result.message ?? "Could not create your account.");
+      return;
     }
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const handleResend = async () => {
     setVerifyError("");
-    const result = await startEmailVerification(
-      name.trim(),
-      email.trim(),
-      password
-    );
+    const result = await resendConfirmation();
     if (!result.success && result.message) setVerifyError(result.message);
   };
 
@@ -196,6 +176,7 @@ export default function AuthModal() {
               id="login-password"
               required
               placeholder="••••••••"
+              autoComplete="current-password"
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
             />
@@ -255,7 +236,9 @@ export default function AuthModal() {
               type="password"
               id="register-password"
               required
+              minLength={8}
               placeholder="••••••••"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -267,7 +250,9 @@ export default function AuthModal() {
               type="password"
               id="register-confirm-password"
               required
+              minLength={8}
               placeholder="••••••••"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
@@ -281,38 +266,22 @@ export default function AuthModal() {
           </div>
 
           <button type="submit" className="auth-submit-btn" disabled={sending}>
-            <span>{sending ? "Sending code…" : "Register Account"}</span>
+            <span>{sending ? "Creating account…" : "Register Account"}</span>
             <SubmitArrow />
           </button>
         </form>
 
-        <form
+        <div
           className={`auth-form${step === "verify" ? " active" : ""}`}
           id="auth-verify-form"
-          onSubmit={handleVerify}
           style={{ display: step === "verify" ? undefined : "none" }}
         >
-          <h3 className="auth-form-title">Verify Your Email</h3>
+          <h3 className="auth-form-title">Confirm Your Email</h3>
           <p className="auth-form-subtitle">
             {pendingEmail
-              ? `Enter the 6-digit code we sent to ${pendingEmail}`
-              : "Enter the 6-digit code we sent to your email address"}
+              ? `We sent a confirmation link to ${pendingEmail}. Open it to activate your account, then sign in.`
+              : "We sent you a confirmation link. Open it to activate your account, then sign in."}
           </p>
-
-          <div className="auth-input-group">
-            <label htmlFor="verify-code-input">Verification Code</label>
-            <input
-              type="text"
-              id="verify-code-input"
-              required
-              placeholder="000000"
-              maxLength={6}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-          </div>
 
           <div
             className="auth-error-banner"
@@ -321,8 +290,12 @@ export default function AuthModal() {
             {verifyError}
           </div>
 
-          <button type="submit" className="auth-submit-btn">
-            <span>Verify &amp; Create Account</span>
+          <button
+            type="button"
+            className="auth-submit-btn"
+            onClick={() => setStep("login")}
+          >
+            <span>Back to Sign In</span>
             <SubmitArrow />
           </button>
 
@@ -334,7 +307,7 @@ export default function AuthModal() {
               color: "#667085",
             }}
           >
-            Didn&apos;t get a code?{" "}
+            Didn&apos;t get the email?{" "}
             <button
               type="button"
               onClick={handleResend}
@@ -348,7 +321,7 @@ export default function AuthModal() {
                 font: "inherit",
               }}
             >
-              Resend Code
+              Resend Link
             </button>
             &nbsp;|&nbsp;
             <button
@@ -370,7 +343,7 @@ export default function AuthModal() {
               Back
             </button>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );

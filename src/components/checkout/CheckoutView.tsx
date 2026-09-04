@@ -6,10 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import DiscoverTag from "@/components/sections/DiscoverTag";
 import { useAuth } from "@/context/AuthProvider";
 import { useStore } from "@/context/StoreProvider";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useUi } from "@/context/UiProvider";
 import { ROUTES } from "@/lib/routes";
 import { readLocal, removeLocal, STORAGE_KEYS } from "@/lib/storage";
-import type { Order, PendingCheckout, PlacedOrderReceipt } from "@/lib/types";
+import type { PendingCheckout, PlacedOrderReceipt } from "@/lib/types";
 
 type StepId = "personal" | "shipping";
 
@@ -33,14 +34,8 @@ const SUCCESS_KEYS = [
 
 export default function CheckoutView() {
   const { session } = useAuth();
-  const {
-    addPlacedOrder,
-    deductInventory,
-    updateVoucherStatus,
-    requests,
-    removeRequestedOrder,
-    removeFromCart,
-  } = useStore();
+  const { removeFromCart, refresh } = useStore();
+  const supabase = getSupabaseBrowserClient();
   const { notify } = useUi();
   const router = useRouter();
 
@@ -110,7 +105,7 @@ export default function CheckoutView() {
 
   const clearSuccessState = () => removeLocal(...SUCCESS_KEYS);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const { fullName, email, phone, street, city, state, zip } = form;
 
     if (!fullName.trim() || !email.trim() || !phone.trim()) {
@@ -129,73 +124,75 @@ export default function CheckoutView() {
       return;
     }
 
+    if (!supabase) {
+      notify("Checkout is not configured. Please contact us to place this order.");
+      return;
+    }
+
+    const productId = pending?.productId ?? "";
+    const confirmationCode = pending?.confirmationCode ?? "";
+    const quantity = pending?.items?.[0]?.quantity ?? 1;
+
+    if (!productId || !confirmationCode) {
+      notify("Your checkout session expired. Please verify the item again.");
+      return;
+    }
+
     setProcessing(true);
 
-    const orderId = `ORD-${Date.now()}`;
-    const now = new Date().toISOString();
-    const productId = pending?.productId ?? "";
-    const items = pending?.items ?? [];
-    const itemQty = items[0]?.quantity ?? 1;
-    const confirmationCode = pending?.confirmationCode ?? "";
-    const userId = session.userId || "guest";
-
-    const order: Order = {
-      orderId,
-      orderDate: now,
-      timestamp: now,
-      confirmationCode,
-      productId,
-      productName: pending?.productName ?? "",
-      items,
-      totalProducts: pending?.totalProducts ?? 1,
-      totalPrice: pending?.totalPrice ?? 0,
-      personalDetails: {
+    // One transaction on the server: it redeems the voucher, decrements
+    // inventory, and writes the order. The price comes from the product row,
+    // so the browser cannot dictate what is charged, and two simultaneous
+    // checkouts can no longer overwrite one another the way the old
+    // read-modify-write against a single JSON blob did.
+    const { data, error } = await supabase.rpc("place_order", {
+      p_code: confirmationCode,
+      p_product_id: productId,
+      p_quantity: quantity,
+      p_personal_details: {
         fullName: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
       },
-      shippingDetails: {
+      p_shipping_details: {
         streetAddress: street.trim(),
         city: city.trim(),
         state: state.trim(),
         zipCode: zip.trim(),
       },
-      paymentDetails: {
-        method: "insurance",
-        billingSameAsShipping: true,
-        billingAddress: "",
-      },
-      userEmail: email.trim(),
-      userId,
-      userName: fullName.trim(),
-    };
+    });
 
-    // Success state is written first so a reload mid-flight still lands on the
-    // receipt rather than an empty checkout. These are plain strings, not JSON,
-    // matching what the theme wrote and what the reader above expects.
+    setProcessing(false);
+
+    if (error || !data) {
+      // Postgres raises a readable message for every rejection path here
+      // (expired code, wrong product, already used, out of stock).
+      notify(error?.message ?? "We could not place that order.");
+      return;
+    }
+
+    const placed = data;
+
+    // Persist the receipt so a reload lands back on the thank-you state.
     window.localStorage.setItem(STORAGE_KEYS.orderPlacedSuccess, "true");
-    window.localStorage.setItem(STORAGE_KEYS.placedOrderId, orderId);
+    window.localStorage.setItem(STORAGE_KEYS.placedOrderId, placed.order_ref);
     window.localStorage.setItem(STORAGE_KEYS.placedProductId, productId);
     window.localStorage.setItem(STORAGE_KEYS.placedEmail, email.trim());
-    window.localStorage.setItem(STORAGE_KEYS.placedUserId, userId);
+    window.localStorage.setItem(
+      STORAGE_KEYS.placedUserId,
+      session.userId ?? "guest"
+    );
     removeLocal(STORAGE_KEYS.pendingCheckout);
 
-    addPlacedOrder(order);
-    if (productId) {
-      deductInventory(productId, itemQty);
-      removeFromCart(productId);
-    }
-    if (confirmationCode) updateVoucherStatus(confirmationCode, "used");
+    removeFromCart(productId);
+    void refresh();
 
-    const granted = requests.find(
-      (r) => r.productId === productId && r.status === "granted"
-    );
-    if (granted) removeRequestedOrder(granted.requestId);
-
-    setTimeout(() => {
-      setProcessing(false);
-      setReceipt({ orderId, productId, email: email.trim(), userId });
-    }, 1500);
+    setReceipt({
+      orderId: placed.order_ref,
+      productId,
+      email: email.trim(),
+      userId: session.userId ?? "guest",
+    });
   };
 
   const itemsCount = pending?.totalProducts ?? 0;

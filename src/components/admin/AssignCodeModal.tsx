@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import type { CoverageRequest, User } from "@/lib/types";
+import type { ProfileRow } from "@/lib/supabase/types";
+import type { CoverageRequest } from "@/lib/types";
 
 interface Props {
   request: CoverageRequest | null;
-  users: User[];
+  users: ProfileRow[];
   onClose: () => void;
   onAssign: (
     request: CoverageRequest,
@@ -55,10 +56,13 @@ export default function AssignCodeModal({
   // scoped to; the theme fell back to the first seeded account.
   const matchedUser = request
     ? users.find(
-        (u) => u.email.toLowerCase() === (request.email ?? "").toLowerCase()
+        (u) =>
+          (u.email ?? "").toLowerCase() === (request.email ?? "").toLowerCase()
       )
     : undefined;
-  const userId = matchedUser?.userId ?? "aaa-user_01";
+  // Fall back to the account that filed the request; vouchers.user_id is a
+  // foreign key to auth.users, so a wrong or invented id would be rejected.
+  const userId = matchedUser?.id ?? request?.userId ?? "";
 
   useEffect(() => {
     if (!request) return;
@@ -84,6 +88,12 @@ export default function AssignCodeModal({
     event.preventDefault();
     const trimmed = code.trim();
     if (!trimmed) return;
+    if (!userId) {
+      window.alert(
+        "No account matches this request, so the code cannot be scoped to a user."
+      );
+      return;
+    }
     onAssign(request, trimmed, request.productId, userId);
   };
 

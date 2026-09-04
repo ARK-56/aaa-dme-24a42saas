@@ -11,15 +11,14 @@ import {
 import { useAuth } from "@/context/AuthProvider";
 import { useRequestModal } from "@/context/RequestModalProvider";
 import { useStore } from "@/context/StoreProvider";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useUi } from "@/context/UiProvider";
 import { sendIntakeEmail } from "@/lib/emailService";
-import type { CoverageRequest } from "@/lib/types";
 
 interface PrescriptionFile {
   name: string;
   size: number;
-  type: string;
-  dataURL: string;
+  file: File;
 }
 
 const EMPTY_FORM = {
@@ -36,13 +35,16 @@ const EMPTY_FORM = {
 /** Insurance intake form shown by every "Request Product" button. */
 export default function RequestModal() {
   const { activeProductId, closeRequestModal } = useRequestModal();
-  const { getProductById, addRequestedOrder, addToCart, cart } = useStore();
+  const { getProductById, addToCart, cart, refresh } = useStore();
+  const supabase = getSupabaseBrowserClient();
   const { session } = useAuth();
   const { notify } = useUi();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [file, setFile] = useState<PrescriptionFile | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const product = activeProductId ? getProductById(activeProductId) : null;
@@ -77,16 +79,7 @@ export default function RequestModal() {
     };
 
   const readFile = (selected: File) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setFile({
-        name: selected.name,
-        size: selected.size,
-        type: selected.type,
-        dataURL: String(event.target?.result ?? ""),
-      });
-    };
-    reader.readAsDataURL(selected);
+    setFile({ name: selected.name, size: selected.size, file: selected });
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -96,48 +89,82 @@ export default function RequestModal() {
     if (dropped) readFile(dropped);
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    setError("");
 
-    const record: CoverageRequest = {
-      requestId: `REQ-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      productId: activeProductId,
-      productName: product?.name ?? "Unknown",
-      fullName: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      medicare_id: form.medicare_id.trim(),
-      dob: form.dob,
-      address: form.address.trim(),
-      zip_code: form.zip_code.trim(),
-      physician_instruction: form.physician_instruction.trim(),
-      hasPrescriptionFile: file !== null,
-      status: "pending",
-      userId: session.userId ?? undefined,
-    };
-    addRequestedOrder(record);
+    if (!supabase || !session.userId) {
+      setError("Please sign in again before submitting this request.");
+      return;
+    }
 
-    // The requested device goes straight into the cart if it is not there yet.
+    setSubmitting(true);
+    const requestRef = `REQ-${Date.now()}`;
+
+    // Upload the prescription first. The old build read it in the browser and
+    // kept only a boolean — the document itself was thrown away.
+    let prescriptionPath: string | null = null;
+    if (file) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${session.userId}/${requestRef}-${safeName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("prescriptions")
+        .upload(path, file.file, { upsert: false });
+
+      if (uploadError) {
+        setSubmitting(false);
+        setError(`Could not upload the prescription: ${uploadError.message}`);
+        return;
+      }
+      prescriptionPath = path;
+    }
+
+    const { error: insertError } = await supabase
+      .from("coverage_requests")
+      .insert({
+        request_ref: requestRef,
+        user_id: session.userId,
+        product_id: activeProductId,
+        product_name: product?.name ?? "Unknown",
+        full_name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        dob: form.dob || null,
+        address: form.address.trim(),
+        zip_code: form.zip_code.trim(),
+        medicare_id: form.medicare_id.trim(),
+        physician_instruction: form.physician_instruction.trim(),
+        prescription_path: prescriptionPath,
+      });
+
+    setSubmitting(false);
+
+    if (insertError) {
+      setError(insertError.message);
+      return;
+    }
+
     const alreadyInCart = cart.some((item) => item.productId === activeProductId);
     if (!alreadyInCart) addToCart(activeProductId, 1);
 
     void sendIntakeEmail({
-      name: record.fullName,
-      dob: record.dob,
-      medicare_id: record.medicare_id,
-      email: record.email,
-      phone: record.phone,
-      zip_code: record.zip_code,
-      address: record.address,
-      physician_instruction: record.physician_instruction,
+      name: form.name.trim(),
+      dob: form.dob,
+      medicare_id: form.medicare_id.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      zip_code: form.zip_code.trim(),
+      address: form.address.trim(),
+      physician_instruction: form.physician_instruction.trim(),
       product_id: activeProductId,
-      product_name: record.productName,
+      product_name: product?.name ?? "Unknown",
     }).catch((err) => console.error("Medical intake email failed:", err));
+
+    void refresh();
 
     const cartNote = alreadyInCart ? "" : " It has been added to your cart.";
     notify(
-      `Request successfully filed for ${record.productName}!${cartNote}`
+      `Request successfully filed for ${product?.name ?? "your device"}!${cartNote}`
     );
 
     setForm(EMPTY_FORM);
@@ -315,8 +342,19 @@ export default function RequestModal() {
             </div>
           </div>
 
-          <button type="submit" className="intake-submit-btn">
-            <span>Submit Inquiry</span>
+          <div
+            className="auth-error-banner"
+            style={{ display: error ? "block" : "none", marginBottom: 12 }}
+          >
+            {error}
+          </div>
+
+          <button
+            type="submit"
+            className="intake-submit-btn"
+            disabled={submitting}
+          >
+            <span>{submitting ? "Submitting…" : "Submit Inquiry"}</span>
             <div className="submit-arrow-badge">
               <svg
                 width="16"
