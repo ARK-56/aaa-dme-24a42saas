@@ -38,7 +38,7 @@ const CATEGORY_SLIDES = [
   },
   {
     title: "Self-Care Devices",
-    body: "Manage your health from home with precision. Our CGM systems and CPAP machines give you 24/7 insight into your glucose levels and sleep health — so you and your care team can make better decisions, faster.",
+    body: "Manage your condition at home with equipment built for it. CPAP and BiPAP machines for sleep apnoea, portable oxygen concentrators rated for air travel, nebulisers and pulse oximeters — so you and your care team can act on what is actually happening, not on guesswork.",
     icon: (
       <>
         <circle cx="12" cy="12" r="10" />
@@ -48,7 +48,7 @@ const CATEGORY_SLIDES = [
   },
   {
     title: "Medical Support",
-    body: "Whether it's oxygen support, lymphedema wraps, or medical braces for joint recovery — our support equipment is clinically backed and insurance-approved, giving you comfort and control at home.",
+    body: "The equipment that makes daily care safe: patient lifts and slings that end manual lifting, alternating pressure mattresses that prevent pressure injury, bath safety equipment and raised toilet seats. Prescribed, documented, and covered where your plan allows.",
     icon: <path d="M3 12h18M3 6h18M3 18h18" />,
   },
 ];

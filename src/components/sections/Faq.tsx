@@ -1,37 +1,40 @@
 import Accordion, { type AccordionEntry } from "@/components/sections/Accordion";
 import DiscoverTag from "@/components/sections/DiscoverTag";
 
-/** Homepage question set. The About page passes its own. */
+/**
+ * Homepage question set — the questions patients actually ask before starting
+ * a request. The About page passes its own, more company-focused set.
+ */
 export const HOME_FAQ_ENTRIES: AccordionEntry[] = [
   {
-    question: "What is a CGM and how does it work?",
+    question: "How do I find out if my insurance covers my equipment?",
     answer:
-      "A Continuous Glucose Monitor (CGM) is a small wearable device that tracks your glucose levels throughout the day and night. It uses a tiny sensor placed just under your skin, usually on your arm or stomach, and sends readings to a smartphone or monitor—no constant finger pricks needed.",
+      "Send us a coverage request and our team checks it directly with your plan — Medicare, Medicaid or private. You get a clear answer on whether the item is covered and what it will cost you, usually within a day or two, before you commit to anything. The check itself is free and there is no obligation to order.",
   },
   {
-    question: "Does using a CGM hurt?",
+    question: "Do I need a prescription before I can order?",
     answer:
-      "Most people say they barely feel the sensor being applied. Once in place, it's discreet and comfortable to wear, and it automatically tracks your glucose without repeated pricking.",
+      "Most durable medical equipment does, including hospital beds, CPAP and BiPAP machines, oxygen concentrators and power wheelchairs. Items like bath safety equipment, canes and rollators generally do not. If you need a prescription and do not have one yet, we contact your physician's office and gather the documentation for you — you do not have to chase signatures or send faxes.",
   },
   {
-    question: "Can hospital beds be adjusted for comfort?",
+    question: "How long does the whole process take?",
     answer:
-      "Absolutely. Most hospital beds allow adjustments to the head, foot, and overall height, making them more comfortable and supportive for both patients and caregivers.",
+      "Eligibility checks usually come back within a day or two. Where a prescription or prior authorisation is needed, approval typically takes three to five business days once your physician responds. After that, standard ground shipping is three to five business days; freight and white-glove items are scheduled with you directly.",
   },
   {
-    question: "What are medical braces used for?",
+    question: "What does the verification code in my cart do?",
     answer:
-      "Medical braces provide support, stability, and pain relief for conditions like arthritis, sports injuries, post-surgical recovery, and joint or muscle weakness.",
+      "When we confirm coverage for a specific item, we issue you a verification code for it. Entering that code against the item in your cart unlocks checkout, which is how we make sure nothing is ordered before coverage is settled. Codes are valid for 24 hours, work once, and are tied to your account and that product.",
   },
   {
-    question: "How do I know which brace is right for me?",
+    question: "What if my request is declined?",
     answer:
-      "Your doctor or healthcare provider will recommend the appropriate type of brace based on your condition, whether it's for your knee, back, wrist, or another area.",
+      "Declined requests appear in your account with the reason. A denial is often down to missing or insufficient documentation rather than a final no, and in many cases it can be resolved with additional notes from your physician or an appeal. Contact us and we will tell you honestly whether it is worth pursuing.",
   },
   {
-    question: "What products does Aaadmeinc help patients access?",
+    question: "Who actually delivers and services the equipment?",
     answer:
-      "We specialize in connecting patients with essential medical equipment, including wheelchairs, walkers,",
+      "AAA DME is an independent navigator, not a supplier. Once coverage is confirmed we connect you with a licensed, accredited supplier who ships the equipment and handles warranty service. We stay involved for resupply scheduling, replacement parts, and any coverage questions that come up later.",
   },
 ];
 

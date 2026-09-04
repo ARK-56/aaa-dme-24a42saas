@@ -97,15 +97,15 @@ const ACHIEVEMENTS: { title: React.ReactNode; icon: React.ReactNode; left: strin
 
 const ABOUT_PROCESS_STEPS: ProcessStep[] = [
   {
-    title: "Learn What CGM Is and How It Works",
-    body: "Understand what a Continuous Glucose Monitor does and whether it's the right solution for your diabetes management needs — no jargon, no confusion.",
+    title: "Understand What You Have Been Prescribed",
+    body: "Before anything else, we explain what your prescribed equipment does, what the alternatives are, and what the HCPCS code on your paperwork actually means — in plain language, without jargon.",
     icon: (
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
     ),
   },
   {
     title: "Check Your Eligibility",
-    body: "Based on your health conditions and insurance plan, we help you determine if you qualify for CGM systems, medical braces, or other durable medical equipment.",
+    body: "We verify your benefits directly with Medicare, Medicaid or your private plan, and tell you what is covered and what it will cost you — before you commit to anything.",
     icon: (
       <>
         <circle cx="12" cy="12" r="5" />
@@ -250,15 +250,14 @@ export default function AboutPage() {
             <div className="vision-block-group">
               <h2 className="vision-block-title">Our Mission</h2>
               <p className="vision-block-desc">
-                AAA DME Inc is a trusted patient support platform dedicated to
-                helping individuals access essential medical equipment —
-                specifically Continuous Glucose Monitoring (CGM) systems and
-                doctor-prescribed medical braces. We bridge the gap between
-                people who need real solutions for chronic conditions and the
-                licensed providers and suppliers who can help. Whether
-                you&apos;re managing diabetes or seeking relief from joint pain,
-                post-surgical recovery, or mobility challenges, we make the
-                process easier to understand and access.
+                AAA DME Inc is a patient support platform that helps people get
+                the durable medical equipment their doctor has prescribed —
+                wheelchairs and mobility scooters, hospital beds and pressure
+                relief, CPAP and oxygen therapy, walkers, bath safety equipment
+                and patient lifts. We sit between the people who need that
+                equipment and the licensed suppliers who provide it, doing the
+                part that usually goes wrong: confirming what your insurance
+                actually covers, and assembling the paperwork to prove it.
               </p>
             </div>
 
@@ -267,11 +266,12 @@ export default function AboutPage() {
             <div className="vision-block-group">
               <h2 className="vision-block-title">Our Vision</h2>
               <p className="vision-block-desc">
-                We envision a world where every patient has clear, stress-free
-                access to the medical equipment they need — covered by insurance,
-                prescribed by their doctor, and delivered to their door. Through
-                education, eligibility support, and trusted supplier connections,
-                we are building a more accessible healthcare future for all.
+                A patient should never go without prescribed equipment because
+                the paperwork defeated them. We want the route from prescription
+                to delivered equipment to be short, transparent and predictable
+                — a clear answer on coverage before any money is committed, a
+                named person handling the documentation, and no surprise bill at
+                the end of it.
               </p>
             </div>
           </div>

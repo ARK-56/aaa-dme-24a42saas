@@ -7,6 +7,7 @@ import ProductRail from "@/components/product/ProductRail";
 import DiscoverTag from "@/components/sections/DiscoverTag";
 import { useRequestModal } from "@/context/RequestModalProvider";
 import { useStore } from "@/context/StoreProvider";
+import { getProductContent } from "@/data/productContent";
 import { assetSrc, PRODUCT_IMAGE_FALLBACK, ROUTES } from "@/lib/routes";
 
 const SHIPPING_DESCRIPTIONS: Record<string, string> = {
@@ -34,6 +35,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
   const { openRequestModal } = useRequestModal();
 
   const product = getProductById(productId);
+  const content = getProductContent(productId);
 
   const [quantity, setQuantity] = useState(1);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -116,14 +118,45 @@ export default function ProductDetailView({ productId }: { productId: string }) 
       },
       {
         label: "PRODUCT OVERVIEW & BENEFITS",
-        content: (
+        content: content ? (
+          <>
+            {content.overview.map((paragraph, i) => (
+              <p
+                className="acc-panel-paragraph"
+                key={i}
+                style={i > 0 ? { marginTop: 12 } : undefined}
+              >
+                {paragraph}
+              </p>
+            ))}
+
+            <p
+              className="acc-panel-paragraph"
+              style={{ marginTop: 16, fontWeight: 700 }}
+            >
+              Key features
+            </p>
+            <ul className="specs-grid-layout" style={{ marginTop: 8 }}>
+              {content.features.map((feature) => (
+                <li className="spec-item" key={feature}>
+                  <span className="spec-value">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="acc-panel-paragraph" style={{ marginTop: 16 }}>
+              <strong>Best for:</strong> {content.bestFor}
+            </p>
+          </>
+        ) : (
+          // Fallback for products added through the admin panel, which have no
+          // editorial entry in productContent.ts yet.
           <>
             <p className="acc-panel-paragraph">{product.description}</p>
             <p className="acc-panel-paragraph" style={{ marginTop: 12 }}>
-              This clinical-grade medical hardware is engineered to support
-              professional rehabilitation standards. Consult with a qualified
-              physician regarding correct application guidelines and insurance
-              claim verification steps.
+              Speak to your physician about whether this equipment suits your
+              condition. Our team can confirm what your plan covers and gather
+              the documentation your insurer needs before you order.
             </p>
           </>
         ),
@@ -141,7 +174,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
         ),
       },
     ];
-  }, [product]);
+  }, [product, content]);
 
   useEffect(() => {
     setPanelHeights(panelRefs.current.map((panel) => panel?.scrollHeight ?? 0));
