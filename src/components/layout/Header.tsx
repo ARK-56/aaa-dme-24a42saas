@@ -5,30 +5,32 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ProfileDropdown from "@/components/layout/ProfileDropdown";
 import { useAuth } from "@/context/AuthProvider";
-import { ROUTES } from "@/lib/routes";
+import { PRODUCT_GROUPS } from "@/lib/categories";
+import { ROUTES, shopGroupHref } from "@/lib/routes";
 
-const NAV_LINKS = [
-  { href: ROUTES.home, label: "Home", match: (p: string) => p === "/" },
-  {
-    href: ROUTES.about,
-    label: "About Us",
-    match: (p: string) => p.startsWith("/about"),
-  },
+interface NavLink {
+  href: string;
+  label: string;
+  match: (pathname: string) => boolean;
+  /** Renders the Shop item as a menu of product groups. */
+  groups?: boolean;
+}
+
+const NAV_LINKS: NavLink[] = [
+  { href: ROUTES.home, label: "Home", match: (p) => p === "/" },
   {
     href: ROUTES.shop,
     label: "Shop",
-    match: (p: string) => p.startsWith("/shop") || p.startsWith("/product"),
+    match: (p) => p.startsWith("/shop") || p.startsWith("/product"),
+    groups: true,
   },
+  { href: ROUTES.about, label: "About Us", match: (p) => p.startsWith("/about") },
   {
     href: ROUTES.contact,
     label: "Contact Us",
-    match: (p: string) => p.startsWith("/contact"),
+    match: (p) => p.startsWith("/contact"),
   },
-  {
-    href: ROUTES.blogs,
-    label: "Blogs",
-    match: (p: string) => p.startsWith("/blog"),
-  },
+  { href: ROUTES.blogs, label: "Blogs", match: (p) => p.startsWith("/blog") },
 ];
 
 export default function Header() {
@@ -36,13 +38,35 @@ export default function Header() {
   const { session, hydrated, openModal, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [shopMenuOpen, setShopMenuOpen] = useState(false);
   const profileBtnRef = useRef<HTMLButtonElement>(null);
+  const shopItemRef = useRef<HTMLDivElement>(null);
 
-  // Close the mobile drawer whenever the route changes.
+  // Close everything whenever the route changes.
   useEffect(() => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setShopMenuOpen(false);
   }, [pathname]);
+
+  // Dismiss the shop menu on outside click or Escape.
+  useEffect(() => {
+    if (!shopMenuOpen) return;
+    const onClick = (event: MouseEvent) => {
+      if (!shopItemRef.current?.contains(event.target as Node)) {
+        setShopMenuOpen(false);
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShopMenuOpen(false);
+    };
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [shopMenuOpen]);
 
   const handleProfileClick = useCallback(() => {
     if (session.isLoggedIn) {
@@ -62,12 +86,12 @@ export default function Header() {
         `Logged in as ${session.userEmail}. Would you like to log out?`
       )
     ) {
-      logout();
+      void logout();
     }
   }, [session, openModal, logout]);
 
-  // `hydrated` gates the signed-in styling so the server markup and the first
-  // client render agree before localStorage is read.
+  // `hydrated` gates the signed-in styling so server markup and the first
+  // client render agree before the session is restored.
   const loggedIn = hydrated && session.isLoggedIn;
   const displayName =
     session.userName || session.userEmail?.split("@")[0] || "Account";
@@ -98,15 +122,73 @@ export default function Header() {
             className={`nav-links-menu${menuOpen ? " mobile-active" : ""}`}
             id="mobile-nav-menu"
           >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`menu-link${link.match(pathname) ? " active" : ""}`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) =>
+              link.groups ? (
+                <div
+                  key={link.href}
+                  className="nav-shop-item"
+                  ref={shopItemRef}
+                  onMouseEnter={() => setShopMenuOpen(true)}
+                  onMouseLeave={() => setShopMenuOpen(false)}
+                >
+                  <Link
+                    href={link.href}
+                    className={`menu-link${
+                      link.match(pathname) ? " active" : ""
+                    }`}
+                    aria-haspopup="true"
+                    aria-expanded={shopMenuOpen}
+                  >
+                    {link.label}
+                    <span className="nav-shop-caret" aria-hidden="true" />
+                  </Link>
+
+                  <button
+                    type="button"
+                    className="nav-shop-toggle"
+                    aria-label="Show product categories"
+                    aria-expanded={shopMenuOpen}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setShopMenuOpen((open) => !open);
+                    }}
+                  />
+
+                  <div
+                    className={`nav-shop-dropdown${
+                      shopMenuOpen ? " open" : ""
+                    }`}
+                  >
+                    <Link href={ROUTES.shop} className="nav-shop-dropdown-all">
+                      All Products
+                    </Link>
+                    {PRODUCT_GROUPS.map((group) => (
+                      <Link
+                        key={group.slug}
+                        href={shopGroupHref(group.slug)}
+                        className="nav-shop-dropdown-link"
+                      >
+                        <span className="nav-shop-dropdown-label">
+                          {group.label}
+                        </span>
+                        <span className="nav-shop-dropdown-meta">
+                          {group.categories.join(" · ")}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`menu-link${link.match(pathname) ? " active" : ""}`}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
+
             <button
               type="button"
               onClick={handleMobileProfileClick}

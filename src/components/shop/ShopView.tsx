@@ -1,8 +1,10 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProductCard from "@/components/product/ProductCard";
 import { useStore } from "@/context/StoreProvider";
+import { getGroupBySlug, PRODUCT_GROUPS } from "@/lib/categories";
 import type { Product } from "@/lib/types";
 
 const ITEMS_PER_PAGE = 6;
@@ -18,9 +20,11 @@ type Availability = (typeof AVAILABILITY)[number]["value"];
 
 export default function ShopView() {
   const { products, categories } = useStore();
+  const params = useSearchParams();
 
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("featured");
   const [page, setPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -45,6 +49,27 @@ export default function ShopView() {
     setPriceMin(bounds.min);
     setPriceMax(bounds.max);
   }, [bounds.min, bounds.max]);
+
+  // ?group=… (header menu, categories carousel) and ?category=… both seed the
+  // sidebar so a linked-in visitor sees the filter already applied.
+  const groupParam = params.get("group");
+  const categoryParam = params.get("category");
+
+  useEffect(() => {
+    const group = getGroupBySlug(groupParam);
+    if (group) {
+      setActiveGroup(group.slug);
+      setSelectedCategories([...group.categories]);
+      return;
+    }
+    if (categoryParam) {
+      setActiveGroup(null);
+      setSelectedCategories([categoryParam]);
+      return;
+    }
+    setActiveGroup(null);
+    setSelectedCategories([]);
+  }, [groupParam, categoryParam]);
 
   const stockCounts = useMemo(
     () => ({
@@ -114,9 +139,16 @@ export default function ShopView() {
     );
   };
 
+  const selectGroup = (slug: string | null) => {
+    const group = getGroupBySlug(slug);
+    setActiveGroup(group?.slug ?? null);
+    setSelectedCategories(group ? [...group.categories] : []);
+  };
+
   const resetFilters = () => {
     setAvailability([]);
     setSelectedCategories([]);
+    setActiveGroup(null);
     priceTouched.current = false;
     setPriceMin(bounds.min);
     setPriceMax(bounds.max);
@@ -144,6 +176,35 @@ export default function ShopView() {
             >
               Reset Filters
             </button>
+          </div>
+
+          <div className="shop-group-filter">
+            <span className="shop-group-filter-label">Shop by need</span>
+            <div className="shop-group-chips">
+              <button
+                type="button"
+                className={`shop-group-chip${
+                  activeGroup === null && selectedCategories.length === 0
+                    ? " active"
+                    : ""
+                }`}
+                onClick={() => selectGroup(null)}
+              >
+                All Products
+              </button>
+              {PRODUCT_GROUPS.map((group) => (
+                <button
+                  key={group.slug}
+                  type="button"
+                  className={`shop-group-chip${
+                    activeGroup === group.slug ? " active" : ""
+                  }`}
+                  onClick={() => selectGroup(group.slug)}
+                >
+                  {group.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="filter-accordion-block active">
@@ -251,13 +312,14 @@ export default function ShopView() {
                         value={category}
                         className="filter-checkbox"
                         checked={selectedCategories.includes(category)}
-                        onChange={() =>
+                        onChange={() => {
+                          setActiveGroup(null);
                           toggle(
                             selectedCategories,
                             category,
                             setSelectedCategories
-                          )
-                        }
+                          );
+                        }}
                       />
                       <span className="checkbox-box" />
                       <span className="checkbox-label">

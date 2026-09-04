@@ -1,3 +1,4 @@
+import AddressLink from "@/components/layout/AddressLink";
 import LegalLayout, { LegalBlock } from "@/components/legal/LegalLayout";
 
 /**
@@ -18,8 +19,8 @@ export default function PrivacyPolicy() {
       <LegalBlock heading="Who We Are">
         <p className="legal-body-copy">
           AAA DME Inc (&ldquo;AAA DME&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;)
-          is a durable medical equipment navigation service based at 25 Elm Pl
-          #401, Brooklyn, NY 11201. We help patients determine whether their
+          is a durable medical equipment navigation service based at{" "}
+          <AddressLink short className="legal-inline-link" />. We help patients determine whether their
           insurance covers prescribed equipment, coordinate the paperwork with
           their physician and insurer, and connect them with licensed suppliers
           who fulfil the order.
@@ -235,8 +236,7 @@ export default function PrivacyPolicy() {
             </a>
           </li>
           <li>
-            <strong>Post:</strong> AAA DME Inc, 25 Elm Pl #401, Brooklyn, NY
-            11201, USA
+            <strong>Post:</strong> AAA DME Inc, <AddressLink className="legal-inline-link" />
           </li>
         </ul>
       </LegalBlock>

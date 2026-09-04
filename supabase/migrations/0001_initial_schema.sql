@@ -11,20 +11,9 @@
 -- Helpers
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- SECURITY DEFINER so policies on `profiles` can call it without recursing
--- through their own RLS check.
-create or replace function public.is_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select coalesce(
-    (select p.is_admin from public.profiles p where p.id = auth.uid()),
-    false
-  );
-$$;
+-- NOTE: is_admin() is defined further down, immediately after the `profiles`
+-- table. A `language sql` body is parsed at creation time, so defining it here
+-- would fail with: relation "public.profiles" does not exist.
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -48,6 +37,7 @@ create table if not exists public.profiles (
   updated_at  timestamptz not null default now()
 );
 
+drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
@@ -77,12 +67,30 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Defined here, after `profiles` exists, because the SQL body is validated at
+-- creation. SECURITY DEFINER so policies on `profiles` can call it without
+-- recursing through their own RLS check.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select p.is_admin from public.profiles p where p.id = auth.uid()),
+    false
+  );
+$$;
+
 alter table public.profiles enable row level security;
 
+drop policy if exists "profiles: read own" on public.profiles;
 create policy "profiles: read own"
   on public.profiles for select
   using (id = auth.uid() or public.is_admin());
 
+drop policy if exists "profiles: update own" on public.profiles;
 create policy "profiles: update own"
   on public.profiles for update
   using (id = auth.uid())
@@ -121,6 +129,7 @@ create table if not exists public.products (
 create index if not exists products_category_idx on public.products (category);
 create index if not exists products_featured_idx on public.products (is_featured, featured_rank);
 
+drop trigger if exists products_set_updated_at on public.products;
 create trigger products_set_updated_at
   before update on public.products
   for each row execute function public.set_updated_at();
@@ -128,10 +137,12 @@ create trigger products_set_updated_at
 alter table public.products enable row level security;
 
 -- The catalogue is public; anonymous visitors must be able to browse.
+drop policy if exists "products: public read" on public.products;
 create policy "products: public read"
   on public.products for select
   using (true);
 
+drop policy if exists "products: admin write" on public.products;
 create policy "products: admin write"
   on public.products for all
   using (public.is_admin())
@@ -140,7 +151,10 @@ create policy "products: admin write"
 -- ─────────────────────────────────────────────────────────────────────────────
 -- coverage_requests — the medical intake form
 -- ─────────────────────────────────────────────────────────────────────────────
-create type public.request_status as enum ('pending', 'granted', 'declined');
+do $$ begin
+  create type public.request_status as enum ('pending', 'granted', 'declined');
+exception when duplicate_object then null;
+end $$;
 
 create table if not exists public.coverage_requests (
   id                    uuid primary key default gen_random_uuid(),
@@ -167,21 +181,25 @@ create table if not exists public.coverage_requests (
 create index if not exists coverage_requests_user_idx on public.coverage_requests (user_id, created_at desc);
 create index if not exists coverage_requests_status_idx on public.coverage_requests (status);
 
+drop trigger if exists coverage_requests_set_updated_at on public.coverage_requests;
 create trigger coverage_requests_set_updated_at
   before update on public.coverage_requests
   for each row execute function public.set_updated_at();
 
 alter table public.coverage_requests enable row level security;
 
+drop policy if exists "requests: read own" on public.coverage_requests;
 create policy "requests: read own"
   on public.coverage_requests for select
   using (user_id = auth.uid() or public.is_admin());
 
+drop policy if exists "requests: insert own" on public.coverage_requests;
 create policy "requests: insert own"
   on public.coverage_requests for insert
   with check (user_id = auth.uid());
 
 -- Only staff change status; a patient cannot approve their own request.
+drop policy if exists "requests: admin update" on public.coverage_requests;
 create policy "requests: admin update"
   on public.coverage_requests for update
   using (public.is_admin())
@@ -190,7 +208,10 @@ create policy "requests: admin update"
 -- ─────────────────────────────────────────────────────────────────────────────
 -- vouchers — coverage verification codes
 -- ─────────────────────────────────────────────────────────────────────────────
-create type public.voucher_status as enum ('granted', 'used', 'expired');
+do $$ begin
+  create type public.voucher_status as enum ('granted', 'used', 'expired');
+exception when duplicate_object then null;
+end $$;
 
 create table if not exists public.vouchers (
   id          uuid primary key default gen_random_uuid(),
@@ -209,11 +230,13 @@ create unique index if not exists vouchers_code_upper_idx on public.vouchers (up
 
 alter table public.vouchers enable row level security;
 
+drop policy if exists "vouchers: read own" on public.vouchers;
 create policy "vouchers: read own"
   on public.vouchers for select
   using (user_id = auth.uid() or public.is_admin());
 
 -- Issuing a code is a staff action only. Redemption happens in place_order().
+drop policy if exists "vouchers: admin write" on public.vouchers;
 create policy "vouchers: admin write"
   on public.vouchers for all
   using (public.is_admin())
@@ -241,12 +264,14 @@ create index if not exists orders_user_idx on public.orders (user_id, created_at
 
 alter table public.orders enable row level security;
 
+drop policy if exists "orders: read own" on public.orders;
 create policy "orders: read own"
   on public.orders for select
   using (user_id = auth.uid() or public.is_admin());
 
 -- No direct insert policy: orders are created only through place_order(),
 -- so the client cannot invent its own total_price.
+drop policy if exists "orders: admin update" on public.orders;
 create policy "orders: admin update"
   on public.orders for update
   using (public.is_admin())
@@ -377,6 +402,7 @@ values ('prescriptions', 'prescriptions', false)
 on conflict (id) do nothing;
 
 -- Objects live under <user-id>/<file>, so the first path segment is the owner.
+drop policy if exists "prescriptions: upload own" on storage.objects;
 create policy "prescriptions: upload own"
   on storage.objects for insert
   with check (
@@ -384,6 +410,7 @@ create policy "prescriptions: upload own"
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "prescriptions: read own" on storage.objects;
 create policy "prescriptions: read own"
   on storage.objects for select
   using (

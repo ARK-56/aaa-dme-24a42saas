@@ -18,6 +18,16 @@ export function productHref(id: string): string {
   return `/product/${id}`;
 }
 
+/** Shop, pre-filtered to one product group (see lib/categories.ts). */
+export function shopGroupHref(slug: string): string {
+  return `${ROUTES.shop}?group=${slug}`;
+}
+
+/** Shop, pre-filtered to a single catalogue category. */
+export function shopCategoryHref(category: string): string {
+  return `${ROUTES.shop}?category=${encodeURIComponent(category)}`;
+}
+
 export function blogHref(slug: string): string {
   return `/blogs/${slug}`;
 }

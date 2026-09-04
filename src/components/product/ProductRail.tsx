@@ -8,19 +8,36 @@ interface Props {
   products: Product[];
   /** The related-products rail uses the shorter card layout. */
   variant?: "full" | "compact";
+  /** Advance on a timer; pauses while the pointer is over the rail. */
+  autoPlay?: boolean;
 }
+
+const AUTOPLAY_MS = 4500;
 
 /**
  * Horizontal product carousel with the theme's progress bar and arrow controls.
  * Backs both "Our Featured Products" on the homepage and "Related Products" on
  * the detail page.
  */
-export default function ProductRail({ products, variant = "full" }: Props) {
-  const slider = useSlider({ count: products.length, gap: 24 });
+export default function ProductRail({
+  products,
+  variant = "full",
+  autoPlay = false,
+}: Props) {
+  const slider = useSlider({
+    count: products.length,
+    gap: 24,
+    autoPlayMs: autoPlay ? AUTOPLAY_MS : undefined,
+    pauseOnHover: autoPlay,
+  });
 
   return (
     <>
-      <div className="products-slider-window" ref={slider.viewportRef}>
+      <div
+        className="products-slider-window"
+        ref={slider.viewportRef}
+        {...slider.hoverProps}
+      >
         <div
           className="products-slider-track"
           id="product-track"

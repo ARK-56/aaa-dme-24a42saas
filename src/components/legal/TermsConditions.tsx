@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AddressLink from "@/components/layout/AddressLink";
 import LegalLayout, { LegalBlock } from "@/components/legal/LegalLayout";
 import { ROUTES } from "@/lib/routes";
 
@@ -20,7 +21,7 @@ export default function TermsConditions() {
       <LegalBlock heading="About These Terms">
         <p className="legal-body-copy">
           These Terms &amp; Conditions are an agreement between you and AAA DME
-          Inc, 25 Elm Pl #401, Brooklyn, NY 11201. They apply whenever you browse
+          Inc, <AddressLink short className="legal-inline-link" />. They apply whenever you browse
           aaadmeinc.com, create an account, submit a coverage request, or place
           an order. If you do not agree with them, please do not use the site.
         </p>
@@ -231,8 +232,7 @@ export default function TermsConditions() {
             </a>
           </li>
           <li>
-            <strong>Post:</strong> AAA DME Inc, 25 Elm Pl #401, Brooklyn, NY
-            11201, USA
+            <strong>Post:</strong> AAA DME Inc, <AddressLink className="legal-inline-link" />
           </li>
         </ul>
       </LegalBlock>

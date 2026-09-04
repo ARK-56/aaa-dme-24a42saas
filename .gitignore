@@ -32,3 +32,6 @@ next-env.d.ts
 
 # original static site, kept locally as a port reference only
 theme/
+
+# supabase cli scratch
+supabase/.temp/

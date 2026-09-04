@@ -8,7 +8,7 @@
 
     /* Semantic Text and Utility Colors */
     --text-light: #E9EDF0;
-    --text-muted: #98A1A9;
+    --text-muted: rgba(160, 181, 180, 1);
     --gray-blue: #4C5F6F;
 
     /* Base Standard Colors (No hardcoded # allowed) */
@@ -841,6 +841,24 @@ body {
     padding: var(--spacing-none) var(--spacing-10);
     /* Layout horizontal spacing padding rules */
     white-space: nowrap;
+}
+
+/* cigna.svg and unitedhealthcare.svg carry a viewBox but no width/height, so
+   they have no intrinsic size and collapsed to nothing inside <img>. An
+   explicit height gives every logo — raster or vector — a box to scale into. */
+.ticker-item img {
+    height: 34px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .ticker-item img {
+        height: 26px;
+        max-width: 120px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -2735,7 +2753,10 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    /* `fill` stretched the footage to the box and distorted faces; `cover`
+       crops instead, keeping the aspect ratio. */
+    object-fit: cover;
+    object-position: center;
     z-index: 2;
 }
 
@@ -2801,10 +2822,14 @@ body {
 
 /* Form Glass box styling values */
 .glass-form-wrapper {
-    background: var(--glass-bg);
+    /* A 15% white panel over bright video left the form barely legible.
+       A dark tinted glass gives the white field text real contrast and matches
+       the dark submit button. */
+    background: rgba(3, 35, 28, 0.72);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
     border-radius: 12px;
     padding: var(--spacing-xl);
     width: 100%;
@@ -2821,7 +2846,7 @@ body {
     font-size: 24px;
     font-weight: 600;
     line-height: 1.3;
-    color: var(--text-dark);
+    color: white;
     margin-bottom: var(--spacing-xl);
 }
 
@@ -2835,12 +2860,17 @@ body {
     display: flex;
     align-items: center;
     width: 100%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.32);
     padding-bottom: var(--spacing-md);
+    transition: border-color 0.2s ease;
+}
+
+.form-input-row:focus-within {
+    border-bottom-color: var(--accent-blue);
 }
 
 .field-icon {
-    color: var(--text-dark);
+    color: white;
     display: inline-flex;
     align-items: center;
 }
@@ -2857,7 +2887,7 @@ body {
 }
 
 .compact-cta-form input::placeholder {
-    color: var(--text-gray-dark);
+    color: rgba(255, 255, 255, 0.62);
 }
 
 .compact-submit-btn {
@@ -2958,12 +2988,12 @@ body {
 .footer-navigation-list a {
     text-decoration: none;
     font-size: 13.5px;
-    color: var(--text-muted);
+    color: white;
     transition: color 0.3s ease;
 }
 
 .footer-navigation-list a:hover {
-    color: var(--white);
+    color: var(--accent-blue);
 }
 
 .footer-social-column {
@@ -8756,24 +8786,24 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--accent-blue);
-    opacity: 0.9;
+    opacity: 1;
 }
 
 .footer-contact-bar-value {
     font-size: 13.5px;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.92);
     line-height: 1.4;
 }
 
 .footer-contact-bar .footer-contact-link {
     font-size: 13.5px;
-    color: var(--text-muted);
+    color: white;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .footer-contact-bar .footer-contact-link:hover {
-    color: var(--white);
+    color: var(--accent-blue);
 }
 
 .footer-contact-bar-divider {
@@ -9045,5 +9075,299 @@ body {
         flex-direction: column !important;
         align-items: center !important;
         gap: 15px;
+    }
+}
+/* ============================================================
+   HEADER — Shop dropdown (product groups)
+   ============================================================ */
+
+.nav-shop-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-shop-caret {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-left: 7px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    opacity: 0.75;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-shop-item:hover .nav-shop-caret {
+    opacity: 1;
+}
+
+/* Invisible hit target so the caret is tappable without following the link. */
+.nav-shop-toggle {
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    display: none;
+}
+
+.nav-shop-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    min-width: 290px;
+    background: #ffffff;
+    border: 1px solid rgba(3, 35, 28, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 18px 44px rgba(3, 35, 28, 0.16);
+    padding: 8px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+    z-index: 1200;
+}
+
+/* Bridges the gap between the link and the panel so hover does not drop. */
+.nav-shop-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 0;
+    right: 0;
+    height: 14px;
+}
+
+.nav-shop-item:hover .nav-shop-dropdown,
+.nav-shop-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.nav-shop-dropdown-all,
+.nav-shop-dropdown-link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 9px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.nav-shop-dropdown-all {
+    font-size: 13px;
+    font-weight: 700;
+    color: #03231c;
+    border-bottom: 1px solid rgba(3, 35, 28, 0.07);
+    border-radius: 9px 9px 0 0;
+    margin-bottom: 4px;
+}
+
+.nav-shop-dropdown-all:hover,
+.nav-shop-dropdown-link:hover {
+    background: rgba(34, 197, 94, 0.09);
+}
+
+.nav-shop-dropdown-label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #03231c;
+}
+
+.nav-shop-dropdown-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: #667085;
+    line-height: 1.35;
+}
+
+@media (max-width: 991px) {
+    .nav-shop-item {
+        display: block;
+        width: 100%;
+    }
+
+    .nav-shop-toggle {
+        display: block;
+    }
+
+    /* In the mobile drawer the panel sits inline rather than floating. */
+    .nav-shop-dropdown {
+        position: static;
+        transform: none;
+        min-width: 0;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background: rgba(3, 35, 28, 0.04);
+        margin: 6px 0 2px;
+        display: none;
+    }
+
+    .nav-shop-item:hover .nav-shop-dropdown {
+        display: none;
+    }
+
+    .nav-shop-dropdown.open {
+        display: block;
+        transform: none;
+    }
+}
+
+/* ============================================================
+   SHOP — "shop by need" group chips
+   ============================================================ */
+
+.shop-group-filter {
+    padding-bottom: 18px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(3, 35, 28, 0.08);
+}
+
+.shop-group-filter-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #667085;
+    margin-bottom: 10px;
+}
+
+.shop-group-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.shop-group-chip {
+    border: 1px solid rgba(3, 35, 28, 0.14);
+    background: #fff;
+    color: #03231c;
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.shop-group-chip:hover {
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.07);
+}
+
+.shop-group-chip.active {
+    background: #03231c;
+    border-color: #03231c;
+    color: #fff;
+}
+
+/* Featured-products: empty state and the per-group "view all" link. */
+.products-empty-note {
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.products-view-all-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+/* ============================================================
+   ABOUT — step cards
+   Replaces the flat SVGs whose caption was baked into a shared bitmap.
+   ============================================================ */
+
+.about-step-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 440px;
+    padding: 22px;
+    isolation: isolate;
+    background: #03231c;
+}
+
+.about-step-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+.about-step-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+        180deg,
+        rgba(3, 35, 28, 0.82) 0%,
+        rgba(3, 35, 28, 0.32) 38%,
+        rgba(3, 35, 28, 0.88) 100%
+    );
+}
+
+.about-step-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: #fff;
+}
+
+.about-step-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-blue);
+}
+
+.about-step-stat {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.about-step-stat-caption {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.about-step-body {
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 0;
+}
+
+@media (max-width: 480px) {
+    .about-step-card {
+        min-height: 380px;
+        padding: 18px;
+    }
+
+    .about-step-stat {
+        font-size: 28px;
     }
 }

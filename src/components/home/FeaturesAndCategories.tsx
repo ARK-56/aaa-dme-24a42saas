@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import DiscoverTag from "@/components/sections/DiscoverTag";
-import { ROUTES } from "@/lib/routes";
+import { PRODUCT_GROUPS } from "@/lib/categories";
+import { shopGroupHref } from "@/lib/routes";
 
 const FEATURE_CARDS = [
   {
@@ -28,30 +29,25 @@ const FEATURE_CARDS = [
   },
 ];
 
-const CATEGORY_SLIDES = [
-  {
-    title: "Mobility Equipment",
-    body: "From lightweight walkers to full-featured wheelchairs and hospital beds, our mobility solutions are prescribed by your doctor and delivered straight to your home — helping you move with confidence every day.",
-    icon: (
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    ),
-  },
-  {
-    title: "Self-Care Devices",
-    body: "Manage your condition at home with equipment built for it. CPAP and BiPAP machines for sleep apnoea, portable oxygen concentrators rated for air travel, nebulisers and pulse oximeters — so you and your care team can act on what is actually happening, not on guesswork.",
-    icon: (
-      <>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 6v6l4 2" />
-      </>
-    ),
-  },
-  {
-    title: "Medical Support",
-    body: "The equipment that makes daily care safe: patient lifts and slings that end manual lifting, alternating pressure mattresses that prevent pressure injury, bath safety equipment and raised toilet seats. Prescribed, documented, and covered where your plan allows.",
-    icon: <path d="M3 12h18M3 6h18M3 18h18" />,
-  },
-];
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  "mobility-equipment": (
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  ),
+  "self-care-devices": (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </>
+  ),
+  "medical-support": <path d="M3 12h18M3 6h18M3 18h18" />,
+};
+
+const CATEGORY_SLIDES = PRODUCT_GROUPS.map((group) => ({
+  slug: group.slug,
+  title: group.label,
+  body: group.blurb,
+  icon: CATEGORY_ICONS[group.slug],
+}));
 
 const RADIUS = 36;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -212,8 +208,11 @@ export default function FeaturesAndCategories() {
                         </button>
                       </div>
 
-                      <Link href={ROUTES.shop} className="btn-order-now-link">
-                        <span>Order Products Now</span>
+                      <Link
+                        href={shopGroupHref(slide.slug)}
+                        className="btn-order-now-link"
+                      >
+                        <span>Shop {slide.title}</span>
                         <div className="order-link-arrow">
                           <svg
                             width="14"

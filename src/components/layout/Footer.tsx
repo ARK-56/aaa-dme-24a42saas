@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useUi } from "@/context/UiProvider";
 import { sendContactEmail } from "@/lib/emailService";
+import AddressLink from "@/components/layout/AddressLink";
 import { ROUTES } from "@/lib/routes";
 
 const EMPTY = { name: "", email: "", phone: "" };
@@ -333,9 +334,7 @@ export default function Footer() {
             </span>
             <div className="footer-contact-bar-text">
               <span className="footer-contact-bar-label">Location</span>
-              <span className="footer-contact-bar-value">
-                25 Elm Pl #401, Brooklyn, NY 11201, USA
-              </span>
+              <AddressLink className="footer-contact-bar-value footer-contact-link" />
             </div>
           </div>
         </div>

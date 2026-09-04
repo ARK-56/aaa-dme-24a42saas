@@ -1,21 +1,28 @@
-const TickerIcon = () => (
-  <div className="ticker-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path
-        d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
-        strokeLinecap="round"
-      />
-    </svg>
-  </div>
-);
+/**
+ * Insurers AAA DME works with. The logo strip doubles as social proof, so it
+ * sits directly under the hero.
+ *
+ * cigna.svg and unitedhealthcare.svg ship with a viewBox but no width/height,
+ * which gives them no intrinsic size inside <img> — `.ticker-item img` in
+ * style.css sets an explicit height so they render alongside the PNGs.
+ */
+const INSURERS = [
+  { src: "/assets/images/insurances/blue-cross.png", name: "Blue Cross" },
+  { src: "/assets/images/insurances/cigna.svg", name: "Cigna" },
+  { src: "/assets/images/insurances/medicare.png", name: "Medicare" },
+  { src: "/assets/images/insurances/aetna.png", name: "Aetna" },
+  {
+    src: "/assets/images/insurances/unitedhealthcare.svg",
+    name: "UnitedHealthcare",
+  },
+];
 
 const TickerGroup = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
   <div className="ticker-group" aria-hidden={ariaHidden || undefined}>
-    {[0, 1, 2].map((i) => (
-      <div className="ticker-item" key={i}>
-        <TickerIcon />
-        <span className="ticker-text">AAA DME</span>
-        <span className="ticker-badge">INC</span>
+    {INSURERS.map((insurer) => (
+      <div className="ticker-item" key={insurer.name}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={insurer.src} alt={`${insurer.name} insurance accepted`} />
       </div>
     ))}
   </div>
