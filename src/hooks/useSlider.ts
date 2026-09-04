@@ -16,8 +16,6 @@ interface Options {
   gap: number;
   /** Advance automatically every N ms. Omit for a manual-only slider. */
   autoPlayMs?: number;
-  /** Freeze auto-play while the pointer is over the viewport. */
-  pauseOnHover?: boolean;
 }
 
 interface Slider {
@@ -33,28 +31,20 @@ interface Slider {
   atEnd: boolean;
   /** Fill ratio for the theme's progress bar, in percent. */
   progress: number;
-  hoverProps: {
-    onMouseEnter: () => void;
-    onMouseLeave: () => void;
-  };
 }
 
 /**
- * Horizontal card slider used by the featured-products, related-products,
- * blogs and about-cards rails. Mirrors the theme's arithmetic: the number of
- * steps is the card count minus however many cards fit in the viewport.
+ * Horizontal card slider used by the featured-products, related-products and
+ * blogs rails. Mirrors the theme's arithmetic: the number of steps is the card
+ * count minus however many cards fit in the viewport, and both arrows wrap.
+ *
+ * (The about-cards rail is not built on this — it is a pure CSS marquee.)
  */
-export function useSlider({
-  count,
-  gap,
-  autoPlayMs,
-  pauseOnHover = false,
-}: Options): Slider {
+export function useSlider({ count, gap, autoPlayMs }: Options): Slider {
   const trackRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [metrics, setMetrics] = useState({ cardWidth: 0, maxIndex: 0 });
-  const hovered = useRef(false);
 
   const measure = useCallback(() => {
     const track = trackRef.current;
@@ -96,11 +86,10 @@ export function useSlider({
   useEffect(() => {
     if (!autoPlayMs || metrics.maxIndex === 0) return;
     const timer = setInterval(() => {
-      if (pauseOnHover && hovered.current) return;
       setIndex((current) => (current < metrics.maxIndex ? current + 1 : 0));
     }, autoPlayMs);
     return () => clearInterval(timer);
-  }, [autoPlayMs, pauseOnHover, metrics.maxIndex]);
+  }, [autoPlayMs, metrics.maxIndex]);
 
   return {
     trackRef,
@@ -114,13 +103,5 @@ export function useSlider({
     atEnd: index >= metrics.maxIndex,
     progress:
       metrics.maxIndex === 0 ? 100 : (index / metrics.maxIndex) * 75 + 25,
-    hoverProps: {
-      onMouseEnter: () => {
-        hovered.current = true;
-      },
-      onMouseLeave: () => {
-        hovered.current = false;
-      },
-    },
   };
 }

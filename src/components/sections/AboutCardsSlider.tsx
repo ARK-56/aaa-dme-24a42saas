@@ -1,9 +1,6 @@
-"use client";
-
-import { useSlider } from "@/hooks/useSlider";
-
-// The last three repeat the first three so the auto-advancing loop never shows
-// an empty gutter — the same trick the theme's markup used.
+// The last three cards repeat the first three so the marquee loops seamlessly:
+// the keyframes translate by exactly half the track, landing back on a copy of
+// the starting frame.
 const CARDS = [
   {
     src: "/assets/images/images/about-card1.svg",
@@ -31,27 +28,17 @@ const CARDS = [
   },
 ];
 
-/** Auto-advancing graphic-card rail, used on the homepage and About page. */
+/**
+ * Continuously crawling graphic-card rail, used on the homepage and About page.
+ *
+ * Motion is entirely CSS: `.about-slider-track` runs the `smoothAboutMarquee`
+ * keyframes, and `.about-slider-window:hover` pauses them. A JS slider here
+ * would be dead code — an animated `transform` always beats an inline one.
+ */
 export default function AboutCardsSlider() {
-  const slider = useSlider({
-    count: CARDS.length,
-    gap: 20,
-    autoPlayMs: 4000,
-    pauseOnHover: true,
-  });
-
   return (
-    <div
-      className="about-slider-window"
-      ref={slider.viewportRef}
-      {...slider.hoverProps}
-    >
-      <div
-        className="about-slider-track"
-        id="about-cards-track"
-        ref={slider.trackRef}
-        style={{ transform: `translate3d(-${slider.offset}px, 0px, 0px)` }}
-      >
+    <div className="about-slider-window">
+      <div className="about-slider-track" id="about-cards-track">
         {CARDS.map((card, index) => (
           <div className="about-graphic-card" key={`${card.src}-${index}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
