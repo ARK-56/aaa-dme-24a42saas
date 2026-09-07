@@ -38,13 +38,6 @@ export default function FeaturedProducts() {
           </div>
 
           <div className="products-filter-tabs">
-            <button
-              type="button"
-              className={`filter-tab${activeGroup === null ? " active" : ""}`}
-              onClick={() => setActiveGroup(null)}
-            >
-              Featured
-            </button>
             {PRODUCT_GROUPS.map((group) => (
               <button
                 key={group.slug}
@@ -52,7 +45,11 @@ export default function FeaturedProducts() {
                 className={`filter-tab${
                   activeGroup === group.slug ? " active" : ""
                 }`}
-                onClick={() => setActiveGroup(group.slug)}
+                onClick={() =>
+                  setActiveGroup((current) =>
+                    current === group.slug ? null : group.slug
+                  )
+                }
                 title={group.label}
               >
                 {group.shortLabel}

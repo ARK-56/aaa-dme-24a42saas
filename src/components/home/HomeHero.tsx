@@ -111,7 +111,7 @@ export default function HomeHero() {
 
           <div className="hero-summary-action-block">
             <p className="hero-summary-statement">
-              Your body holds the answers — we help you see them.
+              Your body holds the answers, and we help you see them.
             </p>
 
             <Link href={ROUTES.shop} className="btn-hero-order-products">

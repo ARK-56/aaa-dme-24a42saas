@@ -24,10 +24,10 @@ const NAV_LINKS: NavLink[] = [
     match: (p) => p.startsWith("/shop") || p.startsWith("/product"),
     groups: true,
   },
-  { href: ROUTES.about, label: "About Us", match: (p) => p.startsWith("/about") },
+  { href: ROUTES.about, label: "About", match: (p) => p.startsWith("/about") },
   {
     href: ROUTES.contact,
-    label: "Contact Us",
+    label: "Contact",
     match: (p) => p.startsWith("/contact"),
   },
   { href: ROUTES.blogs, label: "Blogs", match: (p) => p.startsWith("/blog") },

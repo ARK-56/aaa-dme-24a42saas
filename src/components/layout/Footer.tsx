@@ -189,13 +189,13 @@ export default function Footer() {
                 <Link href={ROUTES.home}>Home</Link>
               </li>
               <li>
-                <Link href={ROUTES.about}>About Us</Link>
+                <Link href={ROUTES.about}>About</Link>
               </li>
               <li>
                 <Link href={ROUTES.shop}>Shop</Link>
               </li>
               <li>
-                <Link href={ROUTES.contact}>Contact Us</Link>
+                <Link href={ROUTES.contact}>Contact</Link>
               </li>
               <li>
                 <Link href={ROUTES.blogs}>Blogs</Link>
