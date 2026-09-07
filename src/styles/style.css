@@ -6863,7 +6863,13 @@ body {
         height: 100vh;
         height: 100dvh;
         background: linear-gradient(160deg, #03231c 0%, #0a2f26 55%, #062119 100%);
-        padding: 20px 24px calc(24px + env(safe-area-inset-bottom));
+        /* The announcement ticker paints on top of this overlay: the header is
+           position:absolute with z-index 999, so it forms a stacking context
+           and this overlay's z-index 1300 only ranks inside it — below the
+           ticker's 1100. Clear the ticker (the same 38px the navbar is offset
+           by) so it cannot cover the logo and close button. */
+        padding: calc(38px + 18px + env(safe-area-inset-top)) 24px
+            calc(24px + env(safe-area-inset-bottom));
         gap: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
