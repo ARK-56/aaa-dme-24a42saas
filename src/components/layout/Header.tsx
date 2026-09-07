@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ProfileDropdown from "@/components/layout/ProfileDropdown";
 import { useAuth } from "@/context/AuthProvider";
 import { PRODUCT_GROUPS } from "@/lib/categories";
+import SocialLinks from "@/components/layout/SocialLinks";
 import { COMPANY } from "@/lib/company";
 import { ROUTES, shopGroupHref } from "@/lib/routes";
 
@@ -53,6 +54,7 @@ export default function Header() {
   // The menu now covers the viewport, so the page behind it must not scroll.
   useEffect(() => {
     if (typeof document === "undefined") return;
+    if (!menuOpen) setShopMenuOpen(false);
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
@@ -177,31 +179,30 @@ export default function Header() {
                   key={link.href}
                   className="nav-shop-item"
                   ref={shopItemRef}
-                  onMouseEnter={() => setShopMenuOpen(true)}
-                  onMouseLeave={() => setShopMenuOpen(false)}
+                  onMouseEnter={() => {
+                    if (!menuOpen) setShopMenuOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    if (!menuOpen) setShopMenuOpen(false);
+                  }}
                 >
                   <Link
                     href={link.href}
                     className={`menu-link${
                       link.match(pathname) ? " active" : ""
-                    }`}
+                    }${shopMenuOpen ? " submenu-open" : ""}`}
                     aria-haspopup="true"
                     aria-expanded={shopMenuOpen}
+                    onClick={(event) => {
+                      if (menuOpen) {
+                        event.preventDefault();
+                        setShopMenuOpen((open) => !open);
+                      }
+                    }}
                   >
                     {link.label}
                     <span className="nav-shop-caret" aria-hidden="true" />
                   </Link>
-
-                  <button
-                    type="button"
-                    className="nav-shop-toggle"
-                    aria-label="Show product categories"
-                    aria-expanded={shopMenuOpen}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      setShopMenuOpen((open) => !open);
-                    }}
-                  />
 
                   <div
                     className={`nav-shop-dropdown${
@@ -255,6 +256,10 @@ export default function Header() {
               <a href={COMPANY.email.href} className="mobile-nav-contact">
                 {COMPANY.email.display}
               </a>
+              <SocialLinks
+                className="mobile-nav-socials"
+                linkClassName="mobile-nav-social"
+              />
             </div>
           </nav>
 

@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { useUi } from "@/context/UiProvider";
 import { sendContactEmail } from "@/lib/emailService";
 import AddressLink from "@/components/layout/AddressLink";
+import SocialLinks from "@/components/layout/SocialLinks";
 import { ROUTES } from "@/lib/routes";
 
 const EMPTY = { name: "", email: "", phone: "" };
@@ -206,65 +207,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="footer-social-column">
-            <a
-              href="https://www.instagram.com/aaadmesupply"
-              target="_blank"
-              rel="noopener"
-              className="social-icon-wrapper glass-element"
-              aria-label="Instagram"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01" />
-              </svg>
-            </a>
-            <a
-              href="https://www.facebook.com/people/AAA-DME-Medical-Supply/61563190737229/"
-              target="_blank"
-              rel="noopener"
-              className="social-icon-wrapper glass-element"
-              aria-label="Facebook"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
-            </a>
-            <a
-              href="https://www.linkedin.com/company/aaadmeinc"
-              target="_blank"
-              rel="noopener"
-              className="social-icon-wrapper glass-element"
-              aria-label="LinkedIn"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                <rect x="2" y="9" width="4" height="12" />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-            </a>
-          </div>
+          <SocialLinks
+            className="footer-social-column"
+            linkClassName="social-icon-wrapper glass-element"
+          />
         </div>
 
         <div className="footer-contact-bar">
