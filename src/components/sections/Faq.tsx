@@ -53,8 +53,8 @@ export default function Faq({ entries = HOME_FAQ_ENTRIES, tag }: Props) {
             <div className="faq-image-container">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/assets/images/images/faq-cover.svg"
-                alt="Frequently asked questions"
+                src="/assets/images/images/faq-cover.png"
+                alt="A clinician taking an older patient's blood pressure"
               />
             </div>
           </div>
