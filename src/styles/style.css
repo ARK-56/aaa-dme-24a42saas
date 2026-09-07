@@ -308,13 +308,12 @@ body {
     }
 }
 
-@media (max-width: 767px) {
-
-    .auth-modal-overlay,
-    .request-modal-overla {
-        width: auto !important;
-    }
-}
+/* Removed a `width: auto !important` override that applied to these overlays
+   below 768px. On a fixed element with `left: 0` and no `right`, auto means
+   shrink-to-fit, so the backdrop sized itself to the card instead of the
+   viewport and left the screen partly uncovered. (It also named
+   `.request-modal-overla`, missing the trailing y, so it never matched that
+   modal at all.) The overlays now cover the viewport at every width. */
 
 .mobile-menu-trigger-btn span {
     width: 22px;
@@ -7873,10 +7872,15 @@ body {
 .auth-modal-overlay,
 .request-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
+    /* inset rather than top/left alone: with only two edges pinned the box
+       depended on width/height resolving, which is what the removed override
+       broke. box-sizing keeps the 20px padding inside the viewport instead of
+       adding 40px to it. */
+    inset: 0;
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     background: rgba(3, 35, 30, 0.5);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -7917,6 +7921,36 @@ body {
     overflow-y: auto;
 }
 
+/* On a phone the auth card becomes a full-screen sheet rather than a small
+   floating panel: there is no useful backdrop to show around it at that size,
+   and the sheet gives the form room and somewhere to scroll. */
+@media (max-width: 767px) {
+    .auth-modal-overlay {
+        padding: 0;
+        align-items: stretch;
+    }
+
+    .auth-modal-card {
+        max-width: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        overflow-y: auto;
+        background: linear-gradient(160deg, #03231c 0%, #0a2f26 55%, #062119 100%);
+        padding: calc(58px + env(safe-area-inset-top)) 22px
+            calc(28px + env(safe-area-inset-bottom));
+    }
+
+    /* Scoped to the overlay so it outranks the base .auth-modal-close rule,
+       which is declared later in the file at the same specificity. */
+    .auth-modal-overlay .auth-modal-close {
+        top: calc(14px + env(safe-area-inset-top));
+        right: 14px;
+        width: 44px;
+        height: 44px;
+    }
+}
+
 .auth-modal-overlay.modal-active .auth-modal-card,
 .request-modal-overlay.modal-active .request-modal-card {
     transform: translateY(0);
@@ -7948,29 +7982,44 @@ body {
 }
 
 /* Tabs */
+/* Login and Register sit on their own lines as two full-width choices rather
+   than a pair of side-by-side underlined tabs. */
 .auth-tabs-row {
     display: flex;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: column;
     margin-bottom: 28px;
-    gap: 16px;
+    gap: 10px;
 }
 
 .auth-tab-btn {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
     color: var(--text-muted);
-    padding: 10px 0;
+    padding: 13px 16px;
     font-family: var(--font-family);
     font-size: 16px;
     font-weight: 600;
+    text-align: center;
     cursor: pointer;
-    transition: var(--transition-smooth);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.auth-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+}
+
+.auth-tab-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
 }
 
 .auth-tab-btn.active {
+    background: rgba(34, 197, 94, 0.14);
+    border-color: var(--accent-blue);
     color: var(--accent-blue);
-    border-bottom-color: var(--accent-blue);
 }
 
 .auth-form {
@@ -8538,7 +8587,16 @@ button.menu-link {
         margin-top: 20px;
     }
 
-    .mobile-account-signin {
+    /* Log In and Sign Up stack, one per line. */
+    .mobile-account-auth {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .mobile-account-signin,
+    .mobile-account-signup {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -8546,13 +8604,22 @@ button.menu-link {
         width: 100%;
         padding: 14px 18px;
         border-radius: 999px;
-        background: var(--accent-blue);
-        border: none;
-        color: #03231c;
         font-family: inherit;
         font-size: 15px;
         font-weight: 700;
         cursor: pointer;
+    }
+
+    .mobile-account-signin {
+        background: var(--accent-blue);
+        border: none;
+        color: #03231c;
+    }
+
+    .mobile-account-signup {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        color: var(--white);
     }
 
     .mobile-account-signin svg {

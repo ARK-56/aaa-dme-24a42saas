@@ -250,30 +250,42 @@ export default function Header() {
                   </button>
                 </>
               ) : (
-                <button
-                  type="button"
-                  className="mobile-account-signin"
-                  onClick={() => {
-                    // Close the overlay first; the modal would otherwise open
-                    // on top of the full-screen nav.
-                    setMenuOpen(false);
-                    openModal("login");
-                  }}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
+                <div className="mobile-account-auth">
+                  <button
+                    type="button"
+                    className="mobile-account-signin"
+                    onClick={() => {
+                      // Close the overlay first; the modal would otherwise open
+                      // on top of the full-screen nav.
+                      setMenuOpen(false);
+                      openModal("login");
+                    }}
                   >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  Log In
-                </button>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    Log In
+                  </button>
+                  <button
+                    type="button"
+                    className="mobile-account-signup"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      openModal("register");
+                    }}
+                  >
+                    Sign Up
+                  </button>
+                </div>
               )}
             </div>
 
