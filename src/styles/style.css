@@ -9211,6 +9211,11 @@ button.menu-link {
     opacity: 1;
 }
 
+.menu-link.submenu-open .nav-shop-caret {
+    transform: rotate(225deg) translateY(-2px);
+    opacity: 1;
+}
+
 .nav-shop-dropdown {
     position: absolute;
     top: calc(100% + 14px);
@@ -9229,17 +9234,6 @@ button.menu-link {
     z-index: 1200;
 }
 
-/* Bridges the gap between the link and the panel so hover does not drop. */
-.nav-shop-dropdown::before {
-    content: "";
-    position: absolute;
-    top: -14px;
-    left: 0;
-    right: 0;
-    height: 14px;
-}
-
-.nav-shop-item:hover .nav-shop-dropdown,
 .nav-shop-dropdown.open {
     opacity: 1;
     visibility: visible;
@@ -9312,10 +9306,6 @@ button.menu-link {
         border: none;
         background: rgba(3, 35, 28, 0.04);
         margin: 6px 0 2px;
-        display: none;
-    }
-
-    .nav-shop-item:hover .nav-shop-dropdown {
         display: none;
     }
 
@@ -9603,6 +9593,7 @@ button,
         display: flex;
         gap: 10px;
         margin-top: 6px;
+        justify-content: flex-end;
     }
 
     .mobile-nav-social {

@@ -179,12 +179,6 @@ export default function Header() {
                   key={link.href}
                   className="nav-shop-item"
                   ref={shopItemRef}
-                  onMouseEnter={() => {
-                    if (!menuOpen) setShopMenuOpen(true);
-                  }}
-                  onMouseLeave={() => {
-                    if (!menuOpen) setShopMenuOpen(false);
-                  }}
                 >
                   <Link
                     href={link.href}
@@ -194,10 +188,12 @@ export default function Header() {
                     aria-haspopup="true"
                     aria-expanded={shopMenuOpen}
                     onClick={(event) => {
-                      if (menuOpen) {
-                        event.preventDefault();
-                        setShopMenuOpen((open) => !open);
-                      }
+                      // Click-only at every width. Hover used to open it while
+                      // onMouseLeave closed it, and crossing the gap to the
+                      // panel made the two fight, which read as flicker.
+                      // "All Products" inside the panel is the way to /shop.
+                      event.preventDefault();
+                      setShopMenuOpen((open) => !open);
                     }}
                   >
                     {link.label}
