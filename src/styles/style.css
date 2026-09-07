@@ -8401,12 +8401,40 @@ body {
     display: none !important;
 }
 
+/* The account item is a <button> (it opens the auth modal rather than
+   navigating), where the rest of the menu are anchors. It rendered as a grey
+   bar across the drawer because nothing reset the user-agent button chrome.
+   Only the properties .menu-link does not already declare are listed here —
+   setting font or colour too would out-specify the mobile rules below and
+   leave the item at the wrong size with no separator. */
+button.menu-link {
+    appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
 @media (max-width: 991px) {
     .mobile-profile-only {
         display: flex !important;
         align-items: center;
         gap: 8px;
         font-weight: bold !important;
+    }
+
+    /* Match the separator the sibling anchors get, and fill the drawer width
+       so the whole row is tappable. */
+    button.menu-link {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    button.menu-link:last-child {
+        border-bottom: none;
     }
 }
 
@@ -9215,6 +9243,17 @@ body {
 @media (max-width: 991px) {
     .nav-shop-item {
         display: block;
+        width: 100%;
+    }
+
+    /* The other rows are flex children of the drawer and so blockify; this one
+       sits inside .nav-shop-item, leaving the anchor inline, where width:100%
+       is ignored. That left the Shop row and its separator only as wide as the
+       word itself. */
+    .nav-shop-item > .menu-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
     }
 
