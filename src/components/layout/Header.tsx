@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ProfileDropdown from "@/components/layout/ProfileDropdown";
 import { useAuth } from "@/context/AuthProvider";
 import { PRODUCT_GROUPS } from "@/lib/categories";
+import { COMPANY } from "@/lib/company";
 import { ROUTES, shopGroupHref } from "@/lib/routes";
 
 interface NavLink {
@@ -48,6 +49,25 @@ export default function Header() {
     setDropdownOpen(false);
     setShopMenuOpen(false);
   }, [pathname]);
+
+  // The menu now covers the viewport, so the page behind it must not scroll.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  // Escape closes the whole menu.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   // Dismiss the shop menu on outside click or Escape.
   useEffect(() => {
@@ -121,7 +141,36 @@ export default function Header() {
           <nav
             className={`nav-links-menu${menuOpen ? " mobile-active" : ""}`}
             id="mobile-nav-menu"
+            aria-hidden={!menuOpen}
           >
+            <div className="mobile-nav-head">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/assets/images/images/logo.png"
+                alt="AAA DME"
+                className="mobile-nav-logo"
+              />
+              <button
+                type="button"
+                className="mobile-nav-close"
+                aria-label="Close menu"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
             {NAV_LINKS.map((link) =>
               link.groups ? (
                 <div
@@ -198,6 +247,15 @@ export default function Header() {
             >
               {loggedIn ? `Account (${displayName})` : "Account / Login"}
             </button>
+
+            <div className="mobile-nav-foot">
+              <a href={COMPANY.phone.href} className="mobile-nav-contact">
+                {COMPANY.phone.display}
+              </a>
+              <a href={COMPANY.email.href} className="mobile-nav-contact">
+                {COMPANY.email.display}
+              </a>
+            </div>
           </nav>
 
           <div className="nav-action-side">
