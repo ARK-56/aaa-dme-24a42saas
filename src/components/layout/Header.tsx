@@ -246,12 +246,16 @@ export default function Header() {
             </button>
 
             <div className="mobile-nav-foot">
-              <a href={COMPANY.phone.href} className="mobile-nav-contact">
-                {COMPANY.phone.display}
-              </a>
-              <a href={COMPANY.email.href} className="mobile-nav-contact">
-                {COMPANY.email.display}
-              </a>
+              {/* Grouped so phone and email stay stacked while the whole
+                  block sits on one row opposite the socials. */}
+              <div className="mobile-nav-contacts">
+                <a href={COMPANY.phone.href} className="mobile-nav-contact">
+                  {COMPANY.phone.display}
+                </a>
+                <a href={COMPANY.email.href} className="mobile-nav-contact">
+                  {COMPANY.email.display}
+                </a>
+              </div>
               <SocialLinks
                 className="mobile-nav-socials"
                 linkClassName="mobile-nav-social"
