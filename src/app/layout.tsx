@@ -23,7 +23,19 @@ export const metadata: Metadata = {
   },
   description:
     "AAA DME Healthcare — doctor-prescribed durable medical equipment, insurance handled for you, delivered nationwide.",
-  icons: { icon: "/assets/images/images/icon.png" },
+  // The previous icon.png was a near-white version of the mark, effectively
+  // invisible on a light tab bar. These are the colour logo on a white plate,
+  // at the sizes browsers actually reach for.
+  icons: {
+    icon: [
+      { url: "/assets/images/images/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/assets/images/images/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/assets/images/images/favicon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/assets/images/images/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     siteName: "AAA DME",
     type: "website",
