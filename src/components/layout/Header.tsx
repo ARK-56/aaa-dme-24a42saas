@@ -98,20 +98,6 @@ export default function Header() {
     }
   }, [session.isLoggedIn, openModal]);
 
-  const handleMobileProfileClick = useCallback(() => {
-    if (!session.isLoggedIn) {
-      openModal("login");
-      return;
-    }
-    if (
-      window.confirm(
-        `Logged in as ${session.userEmail}. Would you like to log out?`
-      )
-    ) {
-      void logout();
-    }
-  }, [session, openModal, logout]);
-
   // `hydrated` gates the signed-in styling so server markup and the first
   // client render agree before the session is restored.
   const loggedIn = hydrated && session.isLoggedIn;
@@ -235,15 +221,61 @@ export default function Header() {
               )
             )}
 
-            <button
-              type="button"
-              onClick={handleMobileProfileClick}
-              className={`menu-link mobile-profile-only${
-                loggedIn ? " logged-in-link" : ""
-              }`}
-            >
-              {loggedIn ? `Account (${displayName})` : "Account / Login"}
-            </button>
+            {/* Mirrors the desktop pill inside the overlay. */}
+            <div className="mobile-account-block">
+              {loggedIn ? (
+                <>
+                  <div className="mobile-account-user">
+                    <span className="account-avatar" aria-hidden="true">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="mobile-account-meta">
+                      <span className="mobile-account-name">{displayName}</span>
+                      {session.userEmail && (
+                        <span className="mobile-account-email">
+                          {session.userEmail}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="mobile-account-signout"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      void logout();
+                    }}
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="mobile-account-signin"
+                  onClick={() => {
+                    // Close the overlay first; the modal would otherwise open
+                    // on top of the full-screen nav.
+                    setMenuOpen(false);
+                    openModal("login");
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Log In
+                </button>
+              )}
+            </div>
 
             <div className="mobile-nav-foot">
               {/* Grouped so phone and email stay stacked while the whole
@@ -264,34 +296,47 @@ export default function Header() {
           </nav>
 
           <div className="nav-action-side">
+            {/* Labelled rather than a bare glyph: signed out it says what it
+                does, signed in it shows whose session it is and carets to
+                signal that it opens a menu. */}
             <button
               ref={profileBtnRef}
               type="button"
               onClick={handleProfileClick}
               className={`profile-btn${loggedIn ? " logged-in" : ""}`}
-              aria-label="Account Profile"
-              aria-expanded={dropdownOpen}
+              aria-label={
+                loggedIn
+                  ? `Account menu for ${displayName}`
+                  : "Log in to your account"
+              }
+              aria-haspopup={loggedIn ? "menu" : undefined}
+              aria-expanded={loggedIn ? dropdownOpen : undefined}
             >
-              <svg
-                className="profile-icon-svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span
-                className="active-badge-checkmark"
-                style={{ display: loggedIn ? "flex" : "none" }}
-              >
-                ✓
+              {loggedIn ? (
+                <span className="account-avatar" aria-hidden="true">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <svg
+                  className="profile-icon-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              )}
+              <span className="profile-btn-label">
+                {loggedIn ? displayName : "Log In"}
               </span>
+              {loggedIn && (
+                <span className="profile-btn-caret" aria-hidden="true" />
+              )}
             </button>
 
             <Link href={ROUTES.cart} className="btn-view-cart">

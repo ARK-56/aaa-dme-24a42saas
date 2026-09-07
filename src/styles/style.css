@@ -7653,72 +7653,103 @@ body {
    AAA DME JAMSTACK UPGRADE COMPONENTS STYLE
    ========================================================================== */
 
-/* 1. Header Profile Button & Dropdown Actions */
+/* 1. Header Account Button & Dropdown Actions
+   This was a 42px circle holding an unlabelled person glyph, so nothing on
+   the page said "this is how you sign in" - the only affordance was an
+   aria-label. It is now a labelled pill: an icon plus "Log In" when signed
+   out, and the user's initial plus their name when signed in. */
 .profile-btn {
     position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 42px;
+    gap: 8px;
     height: 42px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--text-light);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
     cursor: pointer;
-    transition: var(--transition-smooth);
-    padding: 0;
     margin-right: 12px;
-    outline: none;
+    /* Not --transition-smooth: at 0.5s a button feels unresponsive. */
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .profile-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.34);
+    color: var(--white);
 }
 
-.profile-icon-img {
-    width: 20px;
-    height: 20px;
-    filter: invert(1);
-    opacity: 0.85;
-    transition: var(--transition-smooth);
+/* The old rule set outline:none and put nothing in its place, which left
+   keyboard users with no focus indicator on the account entry point. */
+.profile-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
 }
 
 .profile-icon-svg {
-    width: 20px;
-    height: 20px;
-    stroke: var(--text-light);
-    opacity: 0.85;
-    transition: var(--transition-smooth);
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    opacity: 0.9;
+    flex-shrink: 0;
 }
 
-.profile-btn:hover .profile-icon-svg {
-    opacity: 1;
-    stroke: var(--accent-blue);
+.profile-btn-label {
+    /* A long display name must not push the cart button off the bar. */
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
+.profile-btn-caret {
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    opacity: 0.7;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.profile-btn[aria-expanded="true"] .profile-btn-caret {
+    transform: rotate(225deg) translateY(-2px);
+}
+
+/* Signed in reads as an active session: green-tinted, with the initial. */
 .profile-btn.logged-in {
-    border: 2px solid var(--accent-blue);
-    background: rgba(34, 197, 94, 0.08);
+    padding-left: 6px;
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.45);
 }
 
-.active-badge-checkmark {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    display: none;
+.profile-btn.logged-in:hover {
+    background: rgba(34, 197, 94, 0.18);
+    border-color: var(--accent-blue);
+}
+
+/* Initial avatar, shared with the mobile overlay row. rgba is used only where
+   alpha is needed; it is the same #22c55e as var(--accent-blue). */
+.account-avatar {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 15px;
-    height: 15px;
-    background: var(--accent-blue);
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
+    background: var(--accent-blue);
     color: #03231c;
-    font-size: 10px;
-    font-weight: bold;
-    border: 1px solid #03231c;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 /* Dropdown popover styling */
@@ -8470,9 +8501,10 @@ body {
     font-weight: 600;
 }
 
-/* Collapsed profile links in mobile menu drawer */
-.mobile-profile-only {
-    display: none !important;
+/* The overlay's account entry mirrors the desktop pill. Hidden on desktop,
+   where the header pill covers it. */
+.mobile-account-block {
+    display: none;
 }
 
 /* The account item is a <button> (it opens the auth modal rather than
@@ -8492,11 +8524,80 @@ button.menu-link {
 }
 
 @media (max-width: 991px) {
-    .mobile-profile-only {
-        display: flex !important;
+    .mobile-account-block {
+        display: flex;
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .mobile-account-signin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         gap: 8px;
-        font-weight: bold !important;
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 999px;
+        background: var(--accent-blue);
+        border: none;
+        color: #03231c;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .mobile-account-signin svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .mobile-account-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .mobile-account-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .mobile-account-name {
+        color: var(--white);
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .mobile-account-email {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-account-signout {
+        flex-shrink: 0;
+        /* Keep the secondary action a comfortable tap target. */
+        min-height: 40px;
+        padding: 9px 16px;
+        border-radius: 999px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        color: rgba(255, 255, 255, 0.85);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
     }
 
     /* Match the separator the sibling anchors get, and fill the drawer width
@@ -8510,10 +8611,6 @@ button.menu-link {
     button.menu-link:last-child {
         border-bottom: none;
     }
-}
-
-.mobile-profile-only.logged-in-link {
-    color: var(--accent-blue) !important;
 }
 
 /* Product Details Pricing and Badges Section */
