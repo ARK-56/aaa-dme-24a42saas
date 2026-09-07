@@ -3788,8 +3788,16 @@ body {
 .inner-page-hero-section {
     position: relative;
     width: 100%;
-    height: 602px;
-    /* Fixed absolute page template dimension from design image */
+    /* The hero artwork is 1442x602. A fixed 602px height meant that on any
+       viewport wider than 1442px `cover` scaled the image up past the box and
+       cropped it — at 1920px roughly a quarter of the picture was hidden, 97px
+       off the top and bottom, cutting off people's heads.
+
+       Matching the artwork's ratio leaves `cover` nothing to crop: the banner
+       is the design's proportions at every width. min-height keeps the heading
+       readable on narrow screens, where the ratio alone would be too short. */
+    aspect-ratio: 1442 / 602;
+    min-height: 400px;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
