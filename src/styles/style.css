@@ -9430,3 +9430,54 @@ button.menu-link {
         font-size: 28px;
     }
 }
+
+/* ============================================================
+   TOUCH FEEDBACK
+   Mobile browsers paint a translucent blue box over whatever you tap
+   (-webkit-tap-highlight-color defaults to rgba(51,181,229,0.4) in Chrome).
+   On a layout of large cards and full-width rows that reads as the whole
+   section flashing blue.
+   ============================================================ */
+
+html {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Repeated taps on a control would otherwise start selecting its label.
+   Deliberately limited to chrome — body copy, prices and contact details
+   stay selectable. */
+button,
+.menu-link,
+.filter-tab,
+.shop-group-chip,
+.accordion-trigger,
+.details-acc-trigger,
+.checkout-acc-trigger,
+.filter-acc-trigger,
+.nav-arrow-btn,
+.nav-arrow-circle,
+.blog-arrow-circle,
+.gal-nav-circle,
+.pag-nav-btn,
+.pag-num-link,
+.pag-btn,
+.myacct-tab,
+.admin-tab,
+.thumb-card,
+.step-btn,
+.custom-checkbox {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Text the visitor does select should look like the brand, not the browser. */
+::selection {
+    background: rgba(34, 197, 94, 0.28);
+    color: #03231c;
+}
+
+::-moz-selection {
+    background: rgba(34, 197, 94, 0.28);
+    color: #03231c;
+}
