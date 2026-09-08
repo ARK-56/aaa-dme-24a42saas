@@ -38,7 +38,8 @@ export default function CartRow({
     text: verifiedCode ? VERIFIED_MESSAGE : DEFAULT_WARNING,
     tone: verifiedCode ? "success" : "warning",
   });
-  const [imgError, setImgError] = useState(false);
+  // Which src failed, not which to show - see ProductCard for why.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
 
   // A code resolved elsewhere (e.g. an already-approved voucher) unlocks the row.
@@ -97,10 +98,14 @@ export default function CartRow({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={imgError ? PRODUCT_IMAGE_FALLBACK : assetSrc(item.image)}
+            src={
+              failedSrc === assetSrc(item.image)
+                ? PRODUCT_IMAGE_FALLBACK
+                : assetSrc(item.image)
+            }
             alt={item.name}
             className="cart-item-img"
-            onError={() => setImgError(true)}
+            onError={() => setFailedSrc(assetSrc(item.image))}
             style={{
               width: 80,
               height: 80,

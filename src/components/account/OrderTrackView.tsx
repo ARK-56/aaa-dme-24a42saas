@@ -46,14 +46,16 @@ function stageFor(timestamp: string): { stage: Stage; completed: number; fill: s
 }
 
 function ItemImage({ item }: { item: CartItem }) {
-  const [src, setSrc] = useState(assetSrc(item.image));
+  // Which src failed, not which to show — see ProductCard for why.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const resolvedSrc = assetSrc(item.image);
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={failedSrc === resolvedSrc ? PRODUCT_IMAGE_FALLBACK : resolvedSrc}
       alt={item.name}
       className="status-row-item-img"
-      onError={() => setSrc(PRODUCT_IMAGE_FALLBACK)}
+      onError={() => setFailedSrc(resolvedSrc)}
     />
   );
 }

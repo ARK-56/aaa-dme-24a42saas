@@ -51,7 +51,8 @@ export default function ProductDetailView({ productId }: { productId: string }) 
 
   const [quantity, setQuantity] = useState(1);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const [imgError, setImgError] = useState(false);
+  // Which src failed, not which to show - see ProductCard for why.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState(0);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [panelHeights, setPanelHeights] = useState<number[]>([]);
@@ -194,7 +195,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
 
   useEffect(() => {
     setGalleryIndex(0);
-    setImgError(false);
+    setFailedSrc(null);
     setQuantity(1);
   }, [productId]);
 
@@ -212,9 +213,9 @@ export default function ProductDetailView({ productId }: { productId: string }) 
   }
 
   const isSale = Boolean(product.isSale && product.originalPrice);
-  const primeSrc = imgError
-    ? PRODUCT_IMAGE_FALLBACK
-    : assetSrc(gallery[galleryIndex]);
+  const resolvedSrc = assetSrc(gallery[galleryIndex]);
+  const primeSrc =
+    failedSrc === resolvedSrc ? PRODUCT_IMAGE_FALLBACK : resolvedSrc;
 
   return (
     <>
@@ -247,7 +248,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
                   id="prime-gallery-target"
                   alt={product.name}
                   className="display-prime-img"
-                  onError={() => setImgError(true)}
+                  onError={() => setFailedSrc(resolvedSrc)}
                 />
               </div>
 
@@ -260,7 +261,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
                     data-gallery-index={index}
                     onClick={() => {
                       setGalleryIndex(index);
-                      setImgError(false);
+                      setFailedSrc(null);
                     }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}

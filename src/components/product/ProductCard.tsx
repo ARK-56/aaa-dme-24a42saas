@@ -22,7 +22,13 @@ export default function ProductCard({
 }: Props) {
   const { addToCart } = useStore();
   const { openRequestModal } = useRequestModal();
-  const [imgSrc, setImgSrc] = useState(assetSrc(product.image));
+  // Track which src failed rather than which to show. Holding the resolved src
+  // in state froze the image at whatever the product was when the card first
+  // mounted, so when the catalogue swapped from the seed to the database rows
+  // the new image URL never reached the DOM.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const resolvedSrc = assetSrc(product.image);
+  const imgSrc = failedSrc === resolvedSrc ? PRODUCT_IMAGE_FALLBACK : resolvedSrc;
 
   const isSale = Boolean(product.isSale && product.originalPrice);
   const href = productHref(product.id);
@@ -36,7 +42,7 @@ export default function ProductCard({
             src={imgSrc}
             alt={product.name}
             className="product-img"
-            onError={() => setImgSrc(PRODUCT_IMAGE_FALLBACK)}
+            onError={() => setFailedSrc(resolvedSrc)}
           />
         </Link>
       </div>

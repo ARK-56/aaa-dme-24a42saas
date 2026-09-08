@@ -97,7 +97,36 @@ async function uploadOne(localPath) {
   return { url: data.publicUrl, bytes: body.length };
 }
 
+/**
+ * Creates the bucket if it is missing.
+ *
+ * Migration 0003 also creates it, but `create policy ... on storage.objects`
+ * can fail with "must be owner of table objects" in the SQL editor, and that
+ * rolls the whole migration back — bucket included. The Storage API needs no
+ * such ownership, so the service-role key can always make the bucket here.
+ */
+async function ensureBucket() {
+  const { data: buckets, error } = await supabase.storage.listBuckets();
+  if (error) fail(`Could not list buckets: ${error.message}`);
+
+  if (buckets.some((b) => b.id === BUCKET)) return false;
+
+  const { error: createError } = await supabase.storage.createBucket(BUCKET, {
+    public: true,
+  });
+  if (createError) fail(`Could not create the ${BUCKET} bucket: ${createError.message}`);
+  return true;
+}
+
 async function main() {
+  if (dryRun) {
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const exists = (buckets ?? []).some((b) => b.id === BUCKET);
+    console.log(`\n  bucket ${BUCKET}: ${exists ? "exists" : "missing, would be created"}`);
+  } else if (await ensureBucket()) {
+    console.log(`\n  Created the public ${BUCKET} bucket.`);
+  }
+
   const { data: products, error } = await supabase
     .from("products")
     .select("id, name, image, images");
