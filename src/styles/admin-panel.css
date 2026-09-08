@@ -1030,3 +1030,191 @@
         display: none;
     }
 }
+/* ============================================================
+   PRODUCT CATALOGUE — add / edit / delete
+   ============================================================ */
+
+.admin-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #03231c;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.admin-add-btn:hover {
+    background: #0a3f34;
+}
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-row-edit,
+.btn-row-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid #e2e2e2;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-row-edit {
+    color: #03231c;
+}
+
+.btn-row-edit:hover {
+    background: #f1f5f4;
+    border-color: #03231c;
+}
+
+.btn-row-delete {
+    color: #b42318;
+}
+
+.btn-row-delete:hover {
+    background: #fef3f2;
+    border-color: #b42318;
+}
+
+.btn-row-delete:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Wider than the other admin modals: this form has two columns of fields. */
+.product-form-card {
+    max-width: 720px;
+    width: 100%;
+}
+
+.product-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.product-form-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.product-form-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #03231c;
+    cursor: pointer;
+}
+
+.product-form-image-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.product-form-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 84px;
+    height: 84px;
+    flex-shrink: 0;
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    background: #f8fafc;
+    overflow: hidden;
+    font-size: 10px;
+    color: #98a1a9;
+    text-align: center;
+}
+
+.product-form-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-form-upload,
+.product-form-save {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #03231c;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.product-form-upload:disabled,
+.product-form-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.product-form-ghost {
+    padding: 9px 16px;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    background: #fff;
+    color: #03231c;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.product-form-error {
+    margin-top: 16px;
+    padding: 11px 14px;
+    border: 1px solid #fda29b;
+    border-radius: 8px;
+    background: #fef3f2;
+    color: #b42318;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.product-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+@media (max-width: 640px) {
+    .product-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .product-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .product-form-actions button {
+        width: 100%;
+    }
+}

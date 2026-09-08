@@ -21,6 +21,12 @@ export interface Product {
   description: string;
   isSale?: boolean;
   inventory?: number;
+  isFeatured?: boolean;
+  featuredRank?: number;
+  /** Detail-page copy. Lived in src/data/productContent.ts before 0003. */
+  overview?: string[];
+  features?: string[];
+  bestFor?: string;
 }
 
 export interface CartItem {

@@ -41,6 +41,9 @@ export type ProductRow = {
   is_sale: boolean;
   is_featured: boolean;
   featured_rank: number | null;
+  overview: string[];
+  features: string[];
+  best_for: string;
   created_at: string;
   updated_at: string;
 }

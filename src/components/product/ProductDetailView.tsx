@@ -35,7 +35,19 @@ export default function ProductDetailView({ productId }: { productId: string }) 
   const { openRequestModal } = useRequestModal();
 
   const product = getProductById(productId);
-  const content = getProductContent(productId);
+
+  // Copy now lives on the product row so the admin panel can edit it. The
+  // productContent.ts lookup stays as a fallback for any row not yet backfilled
+  // by migration 0004; once that has run everywhere, the file can go.
+  const dbContent =
+    product && product.overview?.length && product.bestFor
+      ? {
+          overview: product.overview,
+          features: product.features ?? [],
+          bestFor: product.bestFor,
+        }
+      : undefined;
+  const content = dbContent ?? getProductContent(productId);
 
   const [quantity, setQuantity] = useState(1);
   const [galleryIndex, setGalleryIndex] = useState(0);

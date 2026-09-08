@@ -38,6 +38,11 @@ export function toProduct(row: ProductRow): Product {
     colors: row.colors,
     sizes: row.sizes,
     isSale: row.is_sale,
+    isFeatured: row.is_featured,
+    featuredRank: row.featured_rank ?? undefined,
+    overview: row.overview,
+    features: row.features,
+    bestFor: row.best_for,
   };
 }
 
