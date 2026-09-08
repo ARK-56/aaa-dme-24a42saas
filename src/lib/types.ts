@@ -23,7 +23,7 @@ export interface Product {
   inventory?: number;
   isFeatured?: boolean;
   featuredRank?: number;
-  /** Detail-page copy. Lived in src/data/productContent.ts before 0003. */
+  /** Detail-page copy, editable in the admin panel. */
   overview?: string[];
   features?: string[];
   bestFor?: string;

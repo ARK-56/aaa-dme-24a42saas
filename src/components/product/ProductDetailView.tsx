@@ -7,7 +7,6 @@ import ProductRail from "@/components/product/ProductRail";
 import DiscoverTag from "@/components/sections/DiscoverTag";
 import { useRequestModal } from "@/context/RequestModalProvider";
 import { useStore } from "@/context/StoreProvider";
-import { getProductContent } from "@/data/productContent";
 import { assetSrc, PRODUCT_IMAGE_FALLBACK, ROUTES } from "@/lib/routes";
 
 const SHIPPING_DESCRIPTIONS: Record<string, string> = {
@@ -36,18 +35,22 @@ export default function ProductDetailView({ productId }: { productId: string }) 
 
   const product = getProductById(productId);
 
-  // Copy now lives on the product row so the admin panel can edit it. The
-  // productContent.ts lookup stays as a fallback for any row not yet backfilled
-  // by migration 0004; once that has run everywhere, the file can go.
-  const dbContent =
-    product && product.overview?.length && product.bestFor
-      ? {
-          overview: product.overview,
-          features: product.features ?? [],
-          bestFor: product.bestFor,
-        }
-      : undefined;
-  const content = dbContent ?? getProductContent(productId);
+  // Copy lives on the product row so the admin panel can edit it. A row with
+  // no copy — a product saved with the fields left blank — falls through to
+  // the generic text below rather than rendering an empty section.
+  //
+  // Memoised because `sections` depends on it and an effect measures panel
+  // heights whenever `sections` changes: a fresh object every render would
+  // recompute the sections and call setPanelHeights with a new array each
+  // time, re-rendering on every pass.
+  const content = useMemo(() => {
+    if (!product?.overview?.length || !product.bestFor) return undefined;
+    return {
+      overview: product.overview,
+      features: product.features ?? [],
+      bestFor: product.bestFor,
+    };
+  }, [product]);
 
   const [quantity, setQuantity] = useState(1);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -162,8 +165,7 @@ export default function ProductDetailView({ productId }: { productId: string }) 
             </p>
           </>
         ) : (
-          // Fallback for products added through the admin panel, which have no
-          // editorial entry in productContent.ts yet.
+          // Shown when a product was saved without overview or best-for copy.
           <>
             <p className="acc-panel-paragraph">{product.description}</p>
             <p className="acc-panel-paragraph" style={{ marginTop: 12 }}>
